@@ -212,3 +212,17 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 560px) {
+  .modal-scrim {
+    padding: var(--s-2);
+  }
+  .modal {
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-body {
+    overflow-y: auto;
+  }
+}
