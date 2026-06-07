@@ -58,6 +58,7 @@ export default function ResizeTool() {
         const ch = cb.height;
 
         if (scaleContent) {
+
            const scaleX = width / cw;
            const scaleY = height / ch;
            const scale = Math.min(scaleX, scaleY);
@@ -69,7 +70,11 @@ export default function ResizeTool() {
            // Center it
            const newWidth = cw * scale;
            const newHeight = ch * scale;
-           page.translateContent((width - newWidth) / 2, (height - newHeight) / 2);
+
+           // Actually pdf-lib handles translation from the bottom-left origin
+           const dx = (width - newWidth) / 2;
+           const dy = (height - newHeight) / 2;
+           page.translateContent(dx, dy);
 
         } else {
            page.setSize(width, height);

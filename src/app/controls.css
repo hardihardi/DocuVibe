@@ -206,3 +206,9 @@
   opacity: 0; pointer-events: none; transition: opacity var(--dur-fast); z-index: 60;
 }
 .tip:hover .tip-pop { opacity: 1; }
+
+@media (max-width: 560px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+}

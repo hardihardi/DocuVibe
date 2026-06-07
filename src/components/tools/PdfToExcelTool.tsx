@@ -51,10 +51,12 @@ export default function PdfToExcelTool() {
         // Group items by Y coordinate to form rows
         const rowsMap = new Map<number, { text: string; x: number }[]>();
 
+
+
         for (const item of textContent.items) {
            if ('str' in item && item.str.trim()) {
-              // Round Y to nearest 5 points to group items on same visual line
-              const y = Math.round(item.transform[5] / 5) * 5;
+              // Round Y to nearest 8 points to group items on same visual line more robustly
+              const y = Math.round(item.transform[5] / 8) * 8;
               if (!rowsMap.has(y)) rowsMap.set(y, []);
               rowsMap.get(y)!.push({ text: item.str.trim(), x: item.transform[4] });
            }
