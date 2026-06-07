@@ -78,7 +78,7 @@ export default function AppShell() {
             <Icon name="menu" size={20} />
           </button>
           <div className="sb-wordmark">
-            Don<b>PDF</b>
+            Docu<b>Vibe</b>
           </div>
         </div>
 
@@ -104,21 +104,11 @@ export default function AppShell() {
 /* ---------------- Brand mark ---------------- */
 function BrandLogo() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M6 3.2h8l4.8 4.8V20a.8.8 0 0 1-.8.8H6a.8.8 0 0 1-.8-.8V4a.8.8 0 0 1 .8-.8Z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-      <path d="M13.6 3.4V8.4h4.8" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
-      <path
-        d="M8.4 13.2h2.1a1.6 1.6 0 0 1 0 3.2H8.4v-3.2Zm0 0V18"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <path d="M8 13h2c1.1 0 2 .9 2 2s-.9 2-2 2H8v-4z"></path>
+      <path d="M14 13l1.5 4 1.5-4"></path>
     </svg>
   );
 }
@@ -163,7 +153,7 @@ function Sidebar({
         </div>
         <div className="stack">
           <div className="sb-wordmark">
-            Don<b>PDF</b>
+            Docu<b>Vibe</b>
           </div>
           <div className="sb-tag">PDF tools, on your device</div>
         </div>
