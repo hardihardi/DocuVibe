@@ -232,7 +232,7 @@ export function MascotState({
     <div className="empty-state">
       <div className={cx("mascot-frame", variant !== "default" && variant)}>
         {/* eslint-disable-next-line @next/next/no-img-element -- small static mascot */}
-        <img src="/mascot.png" alt="DonPDF mascot" />
+        <img src="/mascot.png" alt="DocuVibe mascot" />
       </div>
       <h3>{title}</h3>
       {children && <p>{children}</p>}

@@ -63,7 +63,7 @@ function HouseAd() {
       <div className="house-ad-card">
         <span className="house-ad-label">{"// community supported"}</span>
         <p className="house-ad-text">
-          Suka DonPDF? Bantu biar tetap gratis &amp; tanpa iklan tracking.
+          Suka DocuVibe? Bantu biar tetap gratis &amp; tanpa iklan tracking.
         </p>
         <a
           className="house-ad-cta"

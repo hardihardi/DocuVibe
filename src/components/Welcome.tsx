@@ -41,7 +41,7 @@ export default function Welcome({ go }: { go: (id: string) => void }) {
         <div className="hero-mascot">
           <div className="mascot-disc">
             {/* eslint-disable-next-line @next/next/no-img-element -- hero mascot */}
-            <img src="/mascot.png" alt="DonPDF mascot" />
+            <img src="/mascot.png" alt="DocuVibe mascot" />
           </div>
           <div className="mascot-bubble">
             <Icon name="lock" size={15} strokeWidth={2} /> Your files stay with you

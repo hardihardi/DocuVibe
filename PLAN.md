@@ -1,4 +1,4 @@
-# DonPDF — Build Plan
+# DocuVibe — Build Plan
 
 Privacy-first PDF toolkit. A Sejda-style PDF workshop where **every operation
 runs in the browser** — files are never uploaded. Same stack & retro-terminal

@@ -9,7 +9,7 @@ export default function Phase3Placeholder({ name }: { name: string }) {
       <Banner kind="info" title="Coming soon">
         {name} requires server-side processing to extract tables, recognize text, or convert to Office formats.
         <br/><br/>
-        Because DonPDF is currently a 100% offline, privacy-first tool, this feature is marked for Phase 3 and will require an optional backend or local sidecar.
+        Because DocuVibe is currently a 100% offline, privacy-first tool, this feature is marked for Phase 3 and will require an optional backend or local sidecar.
       </Banner>
 
       <FileDrop

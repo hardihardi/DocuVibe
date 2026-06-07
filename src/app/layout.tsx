@@ -8,7 +8,7 @@ import "./controls.css";
 import "./home.css";
 
 export const metadata: Metadata = {
-  title: "DonPDF — private, in-browser PDF tools",
+  title: "DocuVibe — private, in-browser PDF tools",
   description:
     "Merge, split, organize, sign, watermark, convert and compress PDFs — entirely in your browser. Your files never leave your device: no uploads, no sign-up, no tracking.",
 };

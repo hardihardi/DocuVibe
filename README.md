@@ -1,4 +1,4 @@
-# DonPDF
+# DocuVibe
 
 A local, **privacy-first PDF toolkit** in a retro-terminal UI. Merge, split,
 organize, rotate, and convert PDFs — entirely in your browser. Your files are

@@ -1,4 +1,4 @@
-# DonPDF — Claude notes
+# DocuVibe — Claude notes
 
 Privacy-first, **client-side-only** PDF toolkit. Sibling of DonDevTool: same
 stack (Next 16 export, React 19, Tailwind v4, TS) and the same retro-terminal
@@ -19,7 +19,7 @@ explicit upload notice or a local sidecar. Don't quietly add a server.
   search, and home catalog wire it up automatically. Categories:
   `"Organize & merge"`, `"Convert"`.
 - `src/components/AppShell.tsx` — hash-routed shell (sidebar + topbar + ⌘K
-  search), copied from DonDevTool with DonPDF branding.
+  search), copied from DonDevTool with DocuVibe branding.
 - `src/components/tools/*Tool.tsx` — one component per tool.
 - `src/components/pdfui.tsx` — shared PDF UI: `FileDrop`, `FileList`,
   `ProgressBar`, `RunButton`.
