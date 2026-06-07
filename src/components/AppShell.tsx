@@ -228,7 +228,7 @@ function ToolHeader({ tool, theme, toggleTheme }: { tool: Tool; theme: "light" |
         <span className="hide-sm">On-device</span>
       </span>
       <button
-        className="icon-btn"
+        className="icon-btn hide-sm"
         onClick={toggleTheme}
         aria-label="Toggle theme"
         title="Toggle dark mode"
