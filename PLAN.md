@@ -72,15 +72,13 @@ Still 100% browser-side, no server needed. All four verified in-browser
 - [x] Resize page boxes *with content scaling* (Crop only adjusts the crop box).
 - [x] Multi-select for AcroForm option lists (currently single value).
 
-## Phase 3 — Server-side conversions (separate concern)
+## Phase 3 — Advanced Conversions (Client-Side Emulated)
 
-These genuinely need a backend (table extraction / Office rendering / OCR) and
-**break the privacy-first guarantee** — they must be clearly fenced off (opt-in,
-explicit "this uploads your file" notice) or run via a local sidecar.
+These previously required a backend, but are now implemented fully client-side using JavaScript parsing heuristics (xlsx, docx) and WebAssembly (tesseract.js) to preserve the **privacy-first guarantee**.
 
-- [x] **PDF → Excel** (Placeholder UI added) — table extraction (Camelot/Tabula-style).
-- [x] **PDF → Word / PowerPoint** (Placeholder UI added) — LibreOffice headless or equivalent.
-- [x] **OCR** (Placeholder UI added) — scanned-PDF text layer (Tesseract).
+- [x] **PDF → Excel** — text extraction mapped via Y-coordinate heuristics to .xlsx via sheetjs.
+- [x] **PDF → Word** — text extraction and paragraph construction via docx.
+- [x] **OCR** — local text recognition via tesseract.js and pdf.js rasterization.
 
 Decision pending traction: only build Phase 3 if Phase 1/2 get real usage, and
 likely as an optional service rather than folding a server into this static app.
