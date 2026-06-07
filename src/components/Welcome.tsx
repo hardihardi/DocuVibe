@@ -9,7 +9,7 @@ export default function Welcome({ go }: { go: (id: string) => void }) {
       <section className="hero">
         <div>
           <div className="hero-greet">
-            <span aria-hidden="true">👋</span> Hai Don — welcome back
+            <span aria-hidden="true">👋</span> Hai Vibes — Welcome Back
           </div>
           <h1>
             Every PDF tool you need, <span className="accent">right here.</span>
