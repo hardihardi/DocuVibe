@@ -24,7 +24,7 @@ export default function FormFillTool() {
   const [name, setName] = useState("");
   const [bytes, setBytes] = useState<ArrayBuffer | null>(null);
   const [fields, setFields] = useState<FieldDesc[]>([]);
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, string | string[]>>({});
   const [checks, setChecks] = useState<Record<string, boolean>>({});
   const [flatten, setFlatten] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -40,7 +40,7 @@ export default function FormFillTool() {
       const pdf = await PDFDocument.load(buf, { ignoreEncryption: true });
       const form = pdf.getForm();
       const descs: FieldDesc[] = [];
-      const vals: Record<string, string> = {};
+      const vals: Record<string, string | string[]> = {};
       const chk: Record<string, boolean> = {};
       for (const f of form.getFields()) {
         const fname = f.getName();
@@ -57,8 +57,9 @@ export default function FormFillTool() {
           descs.push({ name: fname, type: "radio", options: f.getOptions() });
           vals[fname] = f.getSelected() ?? "";
         } else if (f instanceof PDFOptionList) {
+          const isMulti = typeof f.isMultiselect === "function" && f.isMultiselect();
           descs.push({ name: fname, type: "optionlist", options: f.getOptions() });
-          vals[fname] = f.getSelected()[0] ?? "";
+          vals[fname] = isMulti ? f.getSelected() : (f.getSelected()[0] ?? "");
         } else {
           descs.push({ name: fname, type: "other" });
         }
@@ -97,17 +98,26 @@ export default function FormFillTool() {
       for (const d of fields) {
         try {
           if (d.type === "text") {
-            form.getTextField(d.name).setText(values[d.name] ?? "");
+            form.getTextField(d.name).setText((values[d.name] as string) ?? "");
           } else if (d.type === "checkbox") {
             const cb = form.getCheckBox(d.name);
             if (checks[d.name]) cb.check();
             else cb.uncheck();
           } else if (d.type === "dropdown") {
-            if (values[d.name]) form.getDropdown(d.name).select(values[d.name]);
+            const val = values[d.name];
+            if (typeof val === "string" && val) form.getDropdown(d.name).select(val);
           } else if (d.type === "radio") {
-            if (values[d.name]) form.getRadioGroup(d.name).select(values[d.name]);
+            const val = values[d.name];
+            if (typeof val === "string" && val) form.getRadioGroup(d.name).select(val);
           } else if (d.type === "optionlist") {
-            if (values[d.name]) form.getOptionList(d.name).select(values[d.name]);
+            const val = values[d.name];
+            const optList = form.getOptionList(d.name);
+            if (Array.isArray(val)) {
+              optList.clear();
+              for (const v of val) optList.select(v);
+            } else if (typeof val === "string" && val) {
+              optList.select(val);
+            }
           }
         } catch {
           /* skip fields that reject a value */
@@ -153,14 +163,34 @@ export default function FormFillTool() {
               <div className="field" key={f.name} style={{ marginBottom: 0 }}>
                 <label title={f.name} style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</label>
                 {f.type === "text" && (
-                  <input className="input" value={values[f.name] ?? ""} onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))} />
+                  <input className="input" value={(values[f.name] as string) ?? ""} onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))} />
                 )}
                 {f.type === "checkbox" && (
                   <Check checked={checks[f.name] ?? false} onChange={(v) => setChecks((c) => ({ ...c, [f.name]: v }))} label={checks[f.name] ? "Checked" : "Unchecked"} />
                 )}
-                {(f.type === "dropdown" || f.type === "radio" || f.type === "optionlist") && (
-                  <select className="select" value={values[f.name] ?? ""} onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}>
+                {(f.type === "dropdown" || f.type === "radio") && (
+                  <select className="select" value={(values[f.name] as string) ?? ""} onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}>
                     <option value="">— none —</option>
+                    {f.options?.map((o) => (
+                      <option key={o} value={o}>{o}</option>
+                    ))}
+                  </select>
+                )}
+                {f.type === "optionlist" && (
+                  <select
+                    className="select"
+                    multiple={Array.isArray(values[f.name])}
+                    value={(values[f.name] as string | string[]) ?? (Array.isArray(values[f.name]) ? [] : "")}
+                    onChange={(e) => {
+                      if (Array.isArray(values[f.name])) {
+                        const selected = Array.from(e.target.selectedOptions, option => option.value);
+                        setValues((v) => ({ ...v, [f.name]: selected }));
+                      } else {
+                        setValues((v) => ({ ...v, [f.name]: e.target.value }));
+                      }
+                    }}
+                  >
+                    {!Array.isArray(values[f.name]) && <option value="">— none —</option>}
                     {f.options?.map((o) => (
                       <option key={o} value={o}>{o}</option>
                     ))}

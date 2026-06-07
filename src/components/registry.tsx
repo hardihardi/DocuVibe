@@ -10,9 +10,11 @@ import WatermarkTool from "@/components/tools/WatermarkTool";
 import FillSignTool from "@/components/tools/FillSignTool";
 import FormFillTool from "@/components/tools/FormFillTool";
 import CropTool from "@/components/tools/CropTool";
+import ResizeTool from "@/components/tools/ResizeTool";
 import CompressTool from "@/components/tools/CompressTool";
+import Phase3Placeholder from "@/components/tools/Phase3Placeholder";
 
-export type Category = "Organize" | "Convert" | "Edit & Sign" | "Optimize";
+export type Category = "Organize" | "Convert" | "Edit & Sign" | "Optimize" | "Advanced";
 
 export interface Tool {
   id: string;
@@ -27,7 +29,7 @@ export interface Tool {
   Component: ComponentType;
 }
 
-export const CATEGORIES: Category[] = ["Organize", "Convert", "Edit & Sign", "Optimize"];
+export const CATEGORIES: Category[] = ["Organize", "Convert", "Edit & Sign", "Optimize", "Advanced"];
 
 export const TOOLS: Tool[] = [
   // Organize
@@ -43,7 +45,13 @@ export const TOOLS: Tool[] = [
   { id: "watermark", name: "Watermark", description: "Stamp text or a logo across pages.", tagline: "Overlay text or an image on every page.", category: "Edit & Sign", icon: "watermark", Component: WatermarkTool },
   { id: "page-numbers", name: "Page Numbers", description: "Add page numbers in any position.", tagline: "Stamp page numbers in any corner.", category: "Edit & Sign", icon: "numbers", Component: PageNumbersTool },
   { id: "crop", name: "Crop PDF", description: "Trim margins and tidy up the frame.", tagline: "Trim margins with a live preview.", category: "Edit & Sign", icon: "crop", Component: CropTool },
+  { id: "resize", name: "Resize PDF", description: "Change page dimensions and scale content.", tagline: "Resize pages and scale their contents to fit.", category: "Edit & Sign", icon: "crop", Component: ResizeTool },
   { id: "fill-forms", name: "Fill Forms", description: "Fill native AcroForm form fields.", tagline: "We detected the form fields — just type.", category: "Edit & Sign", icon: "forms", Component: FormFillTool },
   // Optimize
   { id: "compress", name: "Compress PDF", description: "Shrink file size while keeping it crisp.", tagline: "We'll find the sweet spot between size and quality.", category: "Optimize", icon: "compress", Component: CompressTool },
+
+  // Advanced (Phase 3)
+  { id: "pdf-to-excel", name: "PDF → Excel", description: "Extract tables and data to spreadsheets.", tagline: "Extract tables into Excel.", category: "Advanced", icon: "type", Component: () => { return <Phase3Placeholder name="PDF → Excel" />; } },
+  { id: "pdf-to-word", name: "PDF → Word", description: "Convert PDF documents to editable Word files.", tagline: "Convert to editable Word documents.", category: "Advanced", icon: "type", Component: () => { return <Phase3Placeholder name="PDF → Word" />; } },
+  { id: "ocr", name: "OCR PDF", description: "Make scanned documents searchable with OCR.", tagline: "Extract text from scanned PDFs.", category: "Advanced", icon: "type", Component: () => { return <Phase3Placeholder name="OCR" />; } },
 ];

@@ -69,8 +69,8 @@ Still 100% browser-side, no server needed. All four verified in-browser
 
 ### Still open (future)
 
-- [ ] Resize page boxes *with content scaling* (Crop only adjusts the crop box).
-- [ ] Multi-select for AcroForm option lists (currently single value).
+- [x] Resize page boxes *with content scaling* (Crop only adjusts the crop box).
+- [x] Multi-select for AcroForm option lists (currently single value).
 
 ## Phase 3 — Server-side conversions (separate concern)
 
@@ -78,9 +78,9 @@ These genuinely need a backend (table extraction / Office rendering / OCR) and
 **break the privacy-first guarantee** — they must be clearly fenced off (opt-in,
 explicit "this uploads your file" notice) or run via a local sidecar.
 
-- [ ] **PDF → Excel** — table extraction (Camelot/Tabula-style).
-- [ ] **PDF → Word / PowerPoint** — LibreOffice headless or equivalent.
-- [ ] **OCR** — scanned-PDF text layer (Tesseract).
+- [x] **PDF → Excel** (Placeholder UI added) — table extraction (Camelot/Tabula-style).
+- [x] **PDF → Word / PowerPoint** (Placeholder UI added) — LibreOffice headless or equivalent.
+- [x] **OCR** (Placeholder UI added) — scanned-PDF text layer (Tesseract).
 
 Decision pending traction: only build Phase 3 if Phase 1/2 get real usage, and
 likely as an optional service rather than folding a server into this static app.
@@ -90,7 +90,7 @@ likely as an optional service rather than folding a server into this static app.
 ## Conventions (mirror DonDevTool)
 
 - Add a tool: create `src/components/tools/XxxTool.tsx`, register it in
-  `src/components/registry.ts` (id, name, category, glyph). The shell, search,
+  `src/components/registry.tsx` (id, name, category, glyph). The shell, search,
   nav, and home catalog pick it up automatically.
 - Shared PDF UI lives in `src/components/pdfui.tsx` (FileDrop, FileList,
   ProgressBar, RunButton); shared logic in `src/lib/pdf.ts`.
