@@ -233,6 +233,6 @@ svg { display: block; }
 }
 
 
-@media (max-width: 600px) {
-  .hide-sm { display: none; }
+@media (max-width: 920px) {
+  .hide-sm { display: none !important; }
 }
