@@ -216,3 +216,8 @@
   .toast-wrap { left: var(--s-4); right: var(--s-4); bottom: var(--s-4); }
   .toast { min-width: 0; }
 }
+
+.theme-btn-home .sun-icon { display: none; }
+.theme-btn-home .moon-icon { display: block; }
+[data-theme="dark"] .theme-btn-home .sun-icon { display: block; }
+[data-theme="dark"] .theme-btn-home .moon-icon { display: none; }

@@ -231,3 +231,8 @@ svg { display: block; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+
+@media (max-width: 600px) {
+  .hide-sm { display: none; }
+}

@@ -66,8 +66,6 @@ export default function AppShell() {
       <Sidebar
         route={route}
         nav={nav}
-        theme={theme}
-        toggleTheme={toggleTheme}
         open={navOpen}
       />
       <div className={cx("scrim", navOpen && "show")} onClick={() => setNavOpen(false)} />
@@ -77,16 +75,19 @@ export default function AppShell() {
           <button className="icon-btn" onClick={() => setNavOpen(true)} aria-label="Menu">
             <Icon name="menu" size={20} />
           </button>
-          <div className="sb-wordmark">
+          <div className="sb-wordmark" style={{ flex: 1 }}>
             Docu<b>Vibe</b>
           </div>
+          <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
+            <Icon name={theme === "dark" ? "sun" : "moon"} size={20} strokeWidth={2} />
+          </button>
         </div>
 
         <div className="main-scroll">
           {isHome && <Welcome go={nav} />}
           {!isHome && tool && (
             <>
-              <ToolHeader tool={tool} />
+              <ToolHeader tool={tool} theme={theme} toggleTheme={toggleTheme} />
               <div className={cx("tool-body", WIDE.has(tool.id) && "wide")}>
                 <tool.Component />
               </div>
@@ -117,14 +118,10 @@ function BrandLogo() {
 function Sidebar({
   route,
   nav,
-  theme,
-  toggleTheme,
   open,
 }: {
   route: string;
   nav: (id: string) => void;
-  theme: "light" | "dark";
-  toggleTheme: () => void;
   open: boolean;
 }) {
   const [q, setQ] = useState("");
@@ -209,30 +206,14 @@ function Sidebar({
             <span>Files are processed locally</span>
           </div>
         </div>
-        <div className="theme-row">
-          <span>
-            <Icon name={theme === "dark" ? "moon" : "sun"} size={16} />
-            {theme === "dark" ? "Dark" : "Light"} mode
-          </span>
-          <button
-            className="toggle"
-            onClick={toggleTheme}
-            role="switch"
-            aria-checked={theme === "dark"}
-            aria-label="Toggle theme"
-          >
-            <span className="knob">
-              <Icon name={theme === "dark" ? "moon" : "sun"} size={12} strokeWidth={2} />
-            </span>
-          </button>
-        </div>
+
       </div>
     </nav>
   );
 }
 
 /* ---------------- Tool header ---------------- */
-function ToolHeader({ tool }: { tool: Tool }) {
+function ToolHeader({ tool, theme, toggleTheme }: { tool: Tool; theme: "light" | "dark"; toggleTheme: () => void; }) {
   return (
     <div className="tool-header">
       <div className="th-icon">
@@ -242,10 +223,18 @@ function ToolHeader({ tool }: { tool: Tool }) {
         <h1>{tool.name}</h1>
         <p>{tool.tagline}</p>
       </div>
-      <span className="live-pill">
+      <span className="live-pill" style={{ marginRight: "var(--s-4)" }}>
         <span className="live-dot" />
-        On-device
+        <span className="hide-sm">On-device</span>
       </span>
+      <button
+        className="icon-btn"
+        onClick={toggleTheme}
+        aria-label="Toggle theme"
+        title="Toggle dark mode"
+      >
+        <Icon name={theme === "dark" ? "sun" : "moon"} size={20} strokeWidth={2} />
+      </button>
     </div>
   );
 }
