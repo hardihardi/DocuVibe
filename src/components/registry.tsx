@@ -12,7 +12,9 @@ import FormFillTool from "@/components/tools/FormFillTool";
 import CropTool from "@/components/tools/CropTool";
 import ResizeTool from "@/components/tools/ResizeTool";
 import CompressTool from "@/components/tools/CompressTool";
-import Phase3Placeholder from "@/components/tools/Phase3Placeholder";
+import PdfToExcelTool from "@/components/tools/PdfToExcelTool";
+import PdfToWordTool from "@/components/tools/PdfToWordTool";
+import OcrTool from "@/components/tools/OcrTool";
 
 export type Category = "Organize" | "Convert" | "Edit & Sign" | "Optimize" | "Advanced";
 
@@ -51,7 +53,7 @@ export const TOOLS: Tool[] = [
   { id: "compress", name: "Compress PDF", description: "Shrink file size while keeping it crisp.", tagline: "We'll find the sweet spot between size and quality.", category: "Optimize", icon: "compress", Component: CompressTool },
 
   // Advanced (Phase 3)
-  { id: "pdf-to-excel", name: "PDF → Excel", description: "Extract tables and data to spreadsheets.", tagline: "Extract tables into Excel.", category: "Advanced", icon: "type", Component: () => { return <Phase3Placeholder name="PDF → Excel" />; } },
-  { id: "pdf-to-word", name: "PDF → Word", description: "Convert PDF documents to editable Word files.", tagline: "Convert to editable Word documents.", category: "Advanced", icon: "type", Component: () => { return <Phase3Placeholder name="PDF → Word" />; } },
-  { id: "ocr", name: "OCR PDF", description: "Make scanned documents searchable with OCR.", tagline: "Extract text from scanned PDFs.", category: "Advanced", icon: "type", Component: () => { return <Phase3Placeholder name="OCR" />; } },
+  { id: "pdf-to-excel", name: "PDF → Excel", description: "Extract tables and data to spreadsheets.", tagline: "Extract tables into Excel.", category: "Advanced", icon: "type", Component: PdfToExcelTool },
+  { id: "pdf-to-word", name: "PDF → Word", description: "Convert PDF documents to editable Word files.", tagline: "Convert to editable Word documents.", category: "Advanced", icon: "type", Component: PdfToWordTool },
+  { id: "ocr", name: "OCR PDF", description: "Make scanned documents searchable with OCR.", tagline: "Extract text from scanned PDFs.", category: "Advanced", icon: "type", Component: OcrTool },
 ];
