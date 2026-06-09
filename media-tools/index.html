@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Tools: Kompresor & Konverter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.7/dist/umd/ffmpeg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.min.js"></script>
+    <style>
+        .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Alat Media Lengkap</h1>
+            <p class="text-gray-600">Kompresi & Konversi Gambar dan Video langsung di browser</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="flex border-b border-gray-200">
+                <button onclick="switchTab('compress-img')" id="tab-compress-img" class="flex-1 py-4 px-6 text-center font-medium tab-active focus:outline-none hover:bg-gray-50">Kompres Gambar</button>
+                <button onclick="switchTab('convert-img')" id="tab-convert-img" class="flex-1 py-4 px-6 text-center font-medium text-gray-500 focus:outline-none hover:bg-gray-50">Konversi Gambar</button>
+                <button onclick="switchTab('compress-vid')" id="tab-compress-vid" class="flex-1 py-4 px-6 text-center font-medium text-gray-500 focus:outline-none hover:bg-gray-50">Kompres MP4</button>
+            </div>
+
+            <div class="p-6">
+                <!-- Kompres Gambar -->
+                <div id="content-compress-img">
+                    <h2 class="text-xl font-semibold mb-4">Kompresor Gambar (JPG/PNG/JPEG/Webp)</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Gambar</label>
+                        <input type="file" id="img-compress-file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kualitas Kompresi: <span id="img-compress-quality-val">80</span>%</label>
+                        <input type="range" id="img-compress-quality" min="10" max="100" value="80" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <button onclick="compressImage()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">Kompres Gambar</button>
+
+                    <div id="img-compress-result" class="mt-6 hidden">
+                        <h3 class="text-lg font-medium mb-2">Hasil:</h3>
+                        <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-500 mb-1">Asli (<span id="img-compress-size-old"></span>)</p>
+                                <img id="img-compress-preview-old" class="max-w-full h-auto rounded border" alt="Asli">
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-500 mb-1">Dikompres (<span id="img-compress-size-new"></span>)</p>
+                                <img id="img-compress-preview-new" class="max-w-full h-auto rounded border" alt="Dikompres">
+                            </div>
+                        </div>
+                        <a id="img-compress-download" class="inline-block bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-200" download>Download Hasil</a>
+                    </div>
+                </div>
+
+                <!-- Konversi Gambar -->
+                <div id="content-convert-img" class="hidden">
+                    <h2 class="text-xl font-semibold mb-4">Konversi Gambar</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Gambar</label>
+                        <input type="file" id="img-convert-file" accept=".jpg,.jpeg,.png" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Konversi Ke</label>
+                        <select id="img-convert-target" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border">
+                            <option value="image/jpeg">JPG / JPEG</option>
+                            <option value="image/webp">WebP</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Dukungan: PNG ke JPG/JPEG/WebP, JPG ke JPEG/WebP.</p>
+                    </div>
+                    <button onclick="convertImage()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">Konversi Gambar</button>
+
+                    <div id="img-convert-result" class="mt-6 hidden">
+                        <h3 class="text-lg font-medium mb-2">Hasil:</h3>
+                        <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-500 mb-1">Asli (<span id="img-convert-size-old"></span>)</p>
+                                <img id="img-convert-preview-old" class="max-w-full h-auto rounded border" alt="Asli">
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-500 mb-1">Dikonversi (<span id="img-convert-size-new"></span>)</p>
+                                <img id="img-convert-preview-new" class="max-w-full h-auto rounded border" alt="Dikonversi">
+                            </div>
+                        </div>
+                        <a id="img-convert-download" class="inline-block bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-200" download>Download Hasil</a>
+                    </div>
+                </div>
+
+                <!-- Kompres Video -->
+                <div id="content-compress-vid" class="hidden">
+                    <h2 class="text-xl font-semibold mb-4">Kompresor MP4</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Video MP4</label>
+                        <input type="file" id="vid-compress-file" accept=".mp4" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kualitas CRF (Lebih tinggi = Kompresi lebih banyak, Kualitas lebih rendah): <span id="vid-compress-crf-val">28</span></label>
+                        <input type="range" id="vid-compress-crf" min="18" max="51" value="28" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <p class="text-xs text-gray-500 mt-1">Standar: 28. Jangkauan yang baik: 23-35.</p>
+                    </div>
+                    <button id="btn-compress-vid" onclick="compressVideo()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">Kompres Video</button>
+
+                    <div id="vid-compress-status" class="mt-4 text-sm text-gray-600 font-medium"></div>
+
+                    <div id="vid-compress-result" class="mt-6 hidden">
+                        <h3 class="text-lg font-medium mb-2">Hasil:</h3>
+                        <p class="text-sm text-gray-700 mb-2">Ukuran Asli: <span id="vid-compress-size-old" class="font-semibold"></span> | Ukuran Baru: <span id="vid-compress-size-new" class="font-semibold"></span></p>
+                        <video id="vid-compress-preview" controls class="w-full rounded border mb-4"></video>
+                        <a id="vid-compress-download" class="inline-block bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-200" download="compressed.mp4">Download Hasil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
