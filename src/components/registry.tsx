@@ -15,8 +15,12 @@ import CompressTool from "@/components/tools/CompressTool";
 import PdfToExcelTool from "@/components/tools/PdfToExcelTool";
 import PdfToWordTool from "@/components/tools/PdfToWordTool";
 import OcrTool from "@/components/tools/OcrTool";
+import ImageCompressTool from "@/components/tools/ImageCompressTool";
+import ImageConvertTool from "@/components/tools/ImageConvertTool";
+import VideoCompressTool from "@/components/tools/VideoCompressTool";
 
-export type Category = "Organize" | "Convert" | "Edit & Sign" | "Optimize" | "Advanced";
+
+export type Category = "Organize" | "Convert" | "Edit & Sign" | "Optimize" | "Advanced" | "Media";
 
 export interface Tool {
   id: string;
@@ -31,7 +35,7 @@ export interface Tool {
   Component: ComponentType;
 }
 
-export const CATEGORIES: Category[] = ["Organize", "Convert", "Edit & Sign", "Optimize", "Advanced"];
+export const CATEGORIES: Category[] = ["Organize", "Convert", "Edit & Sign", "Optimize", "Advanced", "Media"];
 
 export const TOOLS: Tool[] = [
   // Organize
@@ -56,4 +60,8 @@ export const TOOLS: Tool[] = [
   { id: "pdf-to-excel", name: "PDF → Excel", description: "Extract tables and data to spreadsheets.", tagline: "Extract tables into Excel.", category: "Advanced", icon: "type", Component: PdfToExcelTool },
   { id: "pdf-to-word", name: "PDF → Word", description: "Convert PDF documents to editable Word files.", tagline: "Convert to editable Word documents.", category: "Advanced", icon: "type", Component: PdfToWordTool },
   { id: "ocr", name: "OCR PDF", description: "Make scanned documents searchable with OCR.", tagline: "Extract text from scanned PDFs.", category: "Advanced", icon: "type", Component: OcrTool },
+  // Media
+  { id: "image-compress", name: "Compress Image", description: "Reduce image file size while maintaining quality.", tagline: "Reduce image size without losing visual quality.", category: "Media", icon: "compress", Component: ImageCompressTool },
+  { id: "image-convert", name: "Convert Image", description: "Convert images between formats (PNG, JPG, WEBP).", tagline: "Change image formats easily.", category: "Media", icon: "img2pdf", Component: ImageConvertTool },
+  { id: "video-compress", name: "Compress Video", description: "Reduce MP4 video file size using FFmpeg.", tagline: "Shrink video files using WebAssembly.", category: "Media", icon: "compress", Component: VideoCompressTool },
 ];

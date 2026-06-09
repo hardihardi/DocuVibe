@@ -11,6 +11,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "docx": "^9.7.1",
     "geist": "^1.7.1",
     "jszip": "^3.10.1",
