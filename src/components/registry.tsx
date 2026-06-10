@@ -18,6 +18,15 @@ import OcrTool from "@/components/tools/OcrTool";
 import ImageCompressTool from "@/components/tools/ImageCompressTool";
 import ImageConvertTool from "@/components/tools/ImageConvertTool";
 import VideoCompressTool from "@/components/tools/VideoCompressTool";
+import PDFToHTMLTool from "@/components/tools/PDFToHTMLTool";
+import CropImageTool from "@/components/tools/CropImageTool";
+import RemoveBackgroundTool from "@/components/tools/RemoveBackgroundTool";
+import ResizeImageTool from "@/components/tools/ResizeImageTool";
+import HTMLToImageTool from "@/components/tools/HTMLToImageTool";
+import WatermarkImageTool from "@/components/tools/WatermarkImageTool";
+import RotateImageTool from "@/components/tools/RotateImageTool";
+import BlurFaceTool from "@/components/tools/BlurFaceTool";
+
 
 
 export type Category = "Organize" | "Convert" | "Edit & Sign" | "Optimize" | "Advanced" | "Media";
@@ -61,6 +70,15 @@ export const TOOLS: Tool[] = [
   { id: "pdf-to-word", name: "PDF → Word", description: "Convert PDF documents to editable Word files.", tagline: "Convert to editable Word documents.", category: "Advanced", icon: "type", Component: PdfToWordTool },
   { id: "ocr", name: "OCR PDF", description: "Make scanned documents searchable with OCR.", tagline: "Extract text from scanned PDFs.", category: "Advanced", icon: "type", Component: OcrTool },
   // Media
+
+  { id: "pdf-to-html", name: "PDF → HTML", description: "Convert PDF documents to HTML format.", tagline: "Convert PDF documents to an HTML format.", category: "Convert", icon: "type", Component: PDFToHTMLTool },
+  { id: "crop-image", name: "Crop Image", description: "Crop your images to any size.", tagline: "Crop images.", category: "Media", icon: "crop", Component: CropImageTool },
+  { id: "remove-bg", name: "Remove Background", description: "Remove the background from any image.", tagline: "Remove the background from an image.", category: "Media", icon: "img2pdf", Component: RemoveBackgroundTool },
+  { id: "resize-image", name: "Resize Image", description: "Change the dimensions of your image.", tagline: "Change image dimensions.", category: "Media", icon: "crop", Component: ResizeImageTool },
+  { id: "html-to-image", name: "HTML → Image", description: "Convert HTML snippets into images.", tagline: "Convert HTML code to an image.", category: "Media", icon: "img2pdf", Component: HTMLToImageTool },
+  { id: "watermark-image", name: "Watermark Image", description: "Add a watermark to your images.", tagline: "Overlay text or an image on your image.", category: "Media", icon: "watermark", Component: WatermarkImageTool },
+  { id: "rotate-image", name: "Rotate Image", description: "Rotate your images in the browser.", tagline: "Turn images to the right orientation.", category: "Media", icon: "rotate", Component: RotateImageTool },
+  { id: "blur-face", name: "Blur Face", description: "Automatically detect and blur faces in images.", tagline: "Blur faces in images for privacy.", category: "Media", icon: "shield", Component: BlurFaceTool },
   { id: "image-compress", name: "Compress Image", description: "Reduce image file size while maintaining quality.", tagline: "Reduce image size without losing visual quality.", category: "Media", icon: "compress", Component: ImageCompressTool },
   { id: "image-convert", name: "Convert Image", description: "Convert images between formats (PNG, JPG, WEBP).", tagline: "Change image formats easily.", category: "Media", icon: "img2pdf", Component: ImageConvertTool },
   { id: "video-compress", name: "Compress Video", description: "Reduce MP4 video file size using FFmpeg.", tagline: "Shrink video files using WebAssembly.", category: "Media", icon: "compress", Component: VideoCompressTool },
