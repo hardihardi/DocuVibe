@@ -67,9 +67,9 @@ export default function RotateImageTool() {
         multiple={false}
       />
       {imgSrc && (
-        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow items-center">
-          <div style={{ transform: `rotate(${rotation}deg)`, transition: 'transform 0.3s ease' }}>
-            <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '300px', objectFit: 'contain' }} />
+        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow items-center overflow-hidden w-full">
+          <div style={{ transform: `rotate(${rotation}deg)`, transition: 'transform 0.3s ease' }} className="max-w-full overflow-hidden flex justify-center">
+            <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '300px', maxWidth: '100%', objectFit: 'contain' }} />
           </div>
 
           <div className="my-4 w-full max-w-sm">

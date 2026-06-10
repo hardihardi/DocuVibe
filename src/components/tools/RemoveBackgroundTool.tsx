@@ -74,7 +74,7 @@ export default function RemoveBackgroundTool() {
         <div className="flex flex-col gap-6 bg-zinc-50 dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-800">
 
           {/* Top Toolbar */}
-          <div className="flex justify-between items-center p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+          <div className="flex flex-wrap justify-between items-center p-4 gap-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
              <button
                 onClick={() => setFile(null)}
                 className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
@@ -83,7 +83,7 @@ export default function RemoveBackgroundTool() {
                 <Icon name="x" size={20} />
              </button>
 
-             <div className="w-48">
+             <div className="w-full sm:w-64 order-last sm:order-none flex justify-center">
                 <Segmented
                   value={viewMode}
                   onChange={setViewMode}
@@ -122,7 +122,7 @@ export default function RemoveBackgroundTool() {
                 <img
                    src={currentImg || ''}
                    alt="Preview"
-                   className="z-10 max-h-[60vh] object-contain rounded drop-shadow-md transition-all duration-300"
+                   className="z-10 max-h-[60vh] max-w-full object-contain rounded drop-shadow-md transition-all duration-300"
                 />
              )}
           </div>

@@ -39,7 +39,7 @@ export default function HTMLToImageTool() {
   };
 
   return (
-    <div className="tool-container flex flex-col gap-6">
+    <div className="tool-container flex flex-col gap-6 w-full overflow-hidden">
       {error && <Banner kind="error">{error}</Banner>}
 
       <div className="flex flex-col gap-2">
@@ -55,7 +55,7 @@ export default function HTMLToImageTool() {
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Preview (This will be captured)</label>
-        <div className="border p-4 rounded bg-white text-black overflow-hidden relative">
+        <div className="border p-4 rounded bg-white text-black overflow-auto relative max-w-full w-full">
            <div ref={containerRef} dangerouslySetInnerHTML={{ __html: htmlString }} className="inline-block" />
         </div>
       </div>

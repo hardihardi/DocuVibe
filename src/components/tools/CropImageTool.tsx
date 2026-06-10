@@ -98,7 +98,8 @@ export default function CropImageTool() {
         multiple={false}
       />
       {imgSrc && (
-        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow">
+        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow overflow-hidden w-full">
+          <div className="overflow-auto w-full flex justify-center">
           <ReactCrop
             crop={crop}
             onChange={(_, percentCrop) => setCrop(percentCrop)}
@@ -110,9 +111,10 @@ export default function CropImageTool() {
               alt="Crop me"
               src={imgSrc}
               onLoad={onImageLoad}
-              style={{ maxHeight: '60vh', objectFit: 'contain' }}
+              style={{ maxHeight: '60vh', maxWidth: '100%', objectFit: 'contain' }} className="mx-auto"
             />
           </ReactCrop>
+          </div>
           <RunButton onClick={handleProcess} disabled={processing || !completedCrop} busy={processing} icon="crop">
             {processing ? "Cropping..." : "Crop Image"}
           </RunButton>

@@ -81,18 +81,18 @@ export default function ResizeImageTool() {
       />
       {imgSrc && (
         <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow">
-          <img ref={imgRef} src={imgSrc} onLoad={onImageLoad} alt="Original" style={{ maxHeight: '300px', objectFit: 'contain' }} />
+          <img ref={imgRef} src={imgSrc} onLoad={onImageLoad} alt="Original" style={{ maxHeight: '300px', maxWidth: '100%', objectFit: 'contain' }} />
 
-          <div className="flex gap-4 items-end">
-            <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap sm:flex-nowrap gap-4 items-end w-full">
+            <div className="flex flex-col gap-1 flex-1 sm:flex-none">
               <label className="text-sm font-medium">Width (px)</label>
-              <input type="number" className="border p-2 rounded w-24 dark:bg-zinc-800 dark:border-zinc-700" value={width} onChange={e => handleWidthChange(e.target.value)} />
+              <input type="number" className="border p-2 rounded w-full sm:w-24 dark:bg-zinc-800 dark:border-zinc-700" value={width} onChange={e => handleWidthChange(e.target.value)} />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 flex-1 sm:flex-none">
               <label className="text-sm font-medium">Height (px)</label>
-              <input type="number" className="border p-2 rounded w-24 dark:bg-zinc-800 dark:border-zinc-700" value={height} onChange={e => handleHeightChange(e.target.value)} />
+              <input type="number" className="border p-2 rounded w-full sm:w-24 dark:bg-zinc-800 dark:border-zinc-700" value={height} onChange={e => handleHeightChange(e.target.value)} />
             </div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 w-full sm:w-auto mt-2 sm:mt-0">
               <input type="checkbox" id="aspect" checked={maintainAspect} onChange={e => setMaintainAspect(e.target.checked)} />
               <label htmlFor="aspect" className="text-sm">Maintain aspect ratio</label>
             </div>

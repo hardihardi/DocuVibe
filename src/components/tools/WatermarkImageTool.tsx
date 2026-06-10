@@ -77,7 +77,7 @@ export default function WatermarkImageTool() {
       {imgSrc && (
         <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow items-center w-full">
           <div className="relative overflow-hidden w-full flex justify-center" style={{ maxHeight: '400px' }}>
-            <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '400px', objectFit: 'contain' }} />
+            <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '400px', maxWidth: '100%', objectFit: 'contain' }} />
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ opacity: opacity / 100 }}>
               <span className="text-white font-bold whitespace-nowrap" style={{ fontSize: `${fontSize/2}px`, transform: 'rotate(-45deg)', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>{text}</span>
             </div>

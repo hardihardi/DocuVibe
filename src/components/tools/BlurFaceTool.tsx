@@ -105,7 +105,7 @@ export default function BlurFaceTool() {
       {error && <Banner kind="error">{error}</Banner>}
       {imgSrc && (
         <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow items-center">
-          <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '400px', objectFit: 'contain', width: 'auto' }} crossOrigin="anonymous" />
+          <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '400px', maxWidth: '100%', objectFit: 'contain', width: 'auto' }} crossOrigin="anonymous" />
 
           <RunButton onClick={handleProcess} disabled={processing} busy={processing} icon="shield">
             {processing ? "Detecting & Blurring..." : "Blur Faces"}
