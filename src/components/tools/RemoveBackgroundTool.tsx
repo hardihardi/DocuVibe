@@ -13,6 +13,7 @@ export default function RemoveBackgroundTool() {
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"original" | "removed">("removed");
+  const [bgColor, setBgColor] = useState<string>("transparent");
 
   // Create original preview URL when file changes
   useEffect(() => {
@@ -48,13 +49,52 @@ export default function RemoveBackgroundTool() {
     }
   };
 
-  const handleDownload = () => {
+
+  const handleDownload = async () => {
     if (!processedUrl || !file) return;
+
+    let downloadUrl = processedUrl;
+
+    // If a background color is selected, we need to draw it to a canvas first
+    if (bgColor !== "transparent") {
+      try {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = processedUrl;
+          });
+
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+              ctx.fillStyle = bgColor;
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0);
+
+              const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, "image/png"));
+              if (blob) {
+                  downloadUrl = URL.createObjectURL(blob);
+              }
+          }
+      } catch(e) {
+          console.error("Failed to apply background color for download", e);
+      }
+    }
+
     const a = document.createElement("a");
-    a.href = processedUrl;
+    a.href = downloadUrl;
     a.download = `nobg_${file.name.replace(/\.[^/.]+$/, ".png")}`;
     a.click();
+
+    if (downloadUrl !== processedUrl) {
+        URL.revokeObjectURL(downloadUrl);
+    }
   };
+
 
   const currentImg = viewMode === "original" ? originalUrl : (processedUrl || originalUrl);
 
@@ -105,7 +145,7 @@ export default function RemoveBackgroundTool() {
           {/* Image Preview Area */}
           <div className="relative w-full flex justify-center items-center bg-zinc-100 dark:bg-zinc-800 min-h-[400px] overflow-hidden p-4">
              {/* Checkerboard background for transparency visibility */}
-             <div className="absolute inset-0 z-0" style={{
+             <div className="absolute inset-0 z-0" style={{ backgroundColor: viewMode === "removed" && bgColor !== "transparent" ? bgColor : "transparent",
                  backgroundImage: 'conic-gradient(#ccc 25%, transparent 25%, transparent 50%, #ccc 50%, #ccc 75%, transparent 75%, transparent)',
                  backgroundSize: '20px 20px',
                  backgroundPosition: '0 0, 10px 10px',
@@ -127,13 +167,24 @@ export default function RemoveBackgroundTool() {
              )}
           </div>
 
+
           {/* Bottom Action Bar */}
           <div className="p-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-zinc-500 font-medium">
-               {processedUrl ? "Background removed successfully!" : processing ? "Processing..." : "Ready"}
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+               <label className="text-sm font-medium text-zinc-500 whitespace-nowrap">New Background:</label>
+               <div className="flex gap-2">
+                 <button onClick={() => setBgColor("transparent")} className={`w-8 h-8 rounded-full border-2 ${bgColor === "transparent" ? "border-brand-500" : "border-zinc-300 dark:border-zinc-700"} flex items-center justify-center`} style={{ backgroundImage: 'conic-gradient(#ccc 25%, transparent 25%, transparent 50%, #ccc 50%, #ccc 75%, transparent 75%, transparent)', backgroundSize: '10px 10px' }} title="Transparent"></button>
+                 <button onClick={() => setBgColor("#ffffff")} className={`w-8 h-8 rounded-full border-2 bg-white ${bgColor === "#ffffff" ? "border-brand-500" : "border-zinc-300 dark:border-zinc-700"}`} title="White"></button>
+                 <button onClick={() => setBgColor("#000000")} className={`w-8 h-8 rounded-full border-2 bg-black ${bgColor === "#000000" ? "border-brand-500" : "border-zinc-300 dark:border-zinc-700"}`} title="Black"></button>
+                 <div className="relative">
+                     <input type="color" value={bgColor === "transparent" ? "#ff0000" : bgColor} onChange={(e) => setBgColor(e.target.value)} className="opacity-0 absolute inset-0 w-full h-full cursor-pointer" title="Custom Color" />
+                     <div className={`w-8 h-8 rounded-full border-2 ${bgColor !== "transparent" && bgColor !== "#ffffff" && bgColor !== "#000000" ? "border-brand-500" : "border-zinc-300 dark:border-zinc-700"}`} style={{ backgroundColor: bgColor === "transparent" ? "#ff0000" : bgColor }}></div>
+                 </div>
+               </div>
             </div>
 
             <RunButton
+
                 onClick={handleDownload}
                 disabled={processing || !processedUrl}
                 icon="download"

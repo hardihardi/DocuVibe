@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { FileDrop, RunButton } from "@/components/pdfui";
-import { Banner } from "@/components/ui";
+import { Banner, Segmented } from "@/components/ui";
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -28,6 +28,8 @@ export default function CropImageTool() {
   const imgRef = useRef<HTMLImageElement>(null);
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<Crop>();
+  const [aspect, setAspect] = useState<number | undefined>(1);
+  const [aspectStr, setAspectStr] = useState<string>("1");
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function CropImageTool() {
 
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     const { width, height } = e.currentTarget;
-    setCrop(centerAspectCrop(width, height, 1));
+    setCrop(centerAspectCrop(width, height, aspect || 1));
   }
 
   const handleProcess = async () => {
@@ -99,13 +101,36 @@ export default function CropImageTool() {
       />
       {imgSrc && (
         <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow overflow-hidden w-full">
+
+          <div className="w-full flex flex-col gap-2 mb-4 max-w-sm mx-auto">
+            <label className="text-sm font-medium">Aspect Ratio</label>
+            <Segmented
+              value={aspectStr}
+              onChange={(val) => {
+                setAspectStr(val);
+                const newAspect = val === "free" ? undefined : parseFloat(val);
+                setAspect(newAspect);
+                if (imgRef.current && newAspect) {
+                    setCrop(centerAspectCrop(imgRef.current.width, imgRef.current.height, newAspect));
+                }
+              }}
+              options={[
+                { value: "free", label: "Free" },
+                { value: "1", label: "1:1" },
+                { value: "1.333", label: "4:3" },
+                { value: "1.777", label: "16:9" },
+              ]}
+              block
+            />
+          </div>
           <div className="overflow-auto w-full flex justify-center">
           <ReactCrop
             crop={crop}
             onChange={(_, percentCrop) => setCrop(percentCrop)}
             onComplete={(c) => setCompletedCrop(c)}
-            aspect={1}
+            aspect={aspect}
           >
+
             <img
               ref={imgRef}
               alt="Crop me"

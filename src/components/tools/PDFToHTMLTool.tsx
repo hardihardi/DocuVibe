@@ -3,13 +3,14 @@
 import { useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import { FileDrop } from "@/components/pdfui";
-import { Banner } from "@/components/ui";
+import { Banner, Segmented } from "@/components/ui";
 import { RunButton } from "@/components/pdfui";
 
 export default function PDFToHTMLTool() {
   const [file, setFile] = useState<File | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"text" | "images">("text");
 
   const handleProcess = async () => {
     if (!file) return;
@@ -83,7 +84,21 @@ export default function PDFToHTMLTool() {
       {error && <Banner kind="error">{error}</Banner>}
       {file && (
         <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow">
+
           <p>Selected: {file.name}</p>
+          <div className="flex flex-col gap-1 w-full max-w-sm mb-2">
+            <label className="text-sm font-medium">Extraction Mode</label>
+            <Segmented
+              value={mode}
+              onChange={(v: any) => setMode(v)}
+              options={[
+                { value: "text", label: "Text Only (Semantic)" },
+                { value: "images", label: "High Fidelity (Images)" },
+              ]}
+              block
+            />
+          </div>
+
           <RunButton onClick={handleProcess} disabled={processing} busy={processing} icon="type">
             {processing ? "Converting..." : "Convert to HTML"}
           </RunButton>

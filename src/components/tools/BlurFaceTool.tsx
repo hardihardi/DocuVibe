@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { FileDrop, RunButton } from "@/components/pdfui";
-import { Banner } from "@/components/ui";
+import { Banner, RangeField, Segmented } from "@/components/ui";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
 export default function BlurFaceTool() {
@@ -11,6 +11,8 @@ export default function BlurFaceTool() {
   const imgRef = useRef<HTMLImageElement>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [intensity, setIntensity] = useState(15);
+  const [mode, setMode] = useState<"blur" | "censor">("blur");
 
   useEffect(() => {
     if (file) {
@@ -72,10 +74,17 @@ export default function BlurFaceTool() {
           const tempCtx = tempCanvas.getContext('2d')!;
           tempCtx.putImageData(faceData, 0, 0);
 
-          // Draw blurred
-          ctx.filter = 'blur(15px)';
-          ctx.drawImage(tempCanvas, x, y);
-          ctx.filter = 'none'; // reset
+
+          // Draw effect
+          if (mode === "blur") {
+              ctx.filter = `blur(${intensity}px)`;
+              ctx.drawImage(tempCanvas, x, y);
+              ctx.filter = 'none'; // reset
+          } else {
+              ctx.fillStyle = "black";
+              ctx.fillRect(x, y, w, h);
+          }
+
       }
 
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, file.type));
@@ -105,7 +114,31 @@ export default function BlurFaceTool() {
       {error && <Banner kind="error">{error}</Banner>}
       {imgSrc && (
         <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow items-center">
+
           <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '400px', maxWidth: '100%', objectFit: 'contain', width: 'auto' }} crossOrigin="anonymous" />
+
+          <div className="flex flex-col gap-4 w-full max-w-sm mt-4">
+              <div>
+                  <label className="text-sm font-medium mb-1 block">Effect Mode</label>
+                  <Segmented
+                      value={mode}
+                      onChange={(v: any) => setMode(v)}
+                      options={[
+                        { value: "blur", label: "Gaussian Blur" },
+                        { value: "censor", label: "Black Censor Box" },
+                      ]}
+                      block
+                  />
+              </div>
+
+              {mode === "blur" && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium">Blur Intensity</label>
+                  <RangeField value={intensity} min={2} max={50} onChange={setIntensity} />
+                </div>
+              )}
+          </div>
+
 
           <RunButton onClick={handleProcess} disabled={processing} busy={processing} icon="shield">
             {processing ? "Detecting & Blurring..." : "Blur Faces"}
