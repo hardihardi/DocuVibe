@@ -33,8 +33,8 @@ export default function HTMLToImageTool() {
       a.download = `html_snippet.png`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message || "Failed to convert HTML to image.");
+    } catch (e: unknown) {
+      setError((e instanceof Error ? e.message : "Failed to convert HTML to image."));
     } finally {
       setProcessing(false);
     }

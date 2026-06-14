@@ -27,6 +27,13 @@ import WatermarkImageTool from "@/components/tools/WatermarkImageTool";
 import RotateImageTool from "@/components/tools/RotateImageTool";
 import BlurFaceTool from "@/components/tools/BlurFaceTool";
 
+import CompressWordTool from "@/components/tools/CompressWordTool";
+import CompressExcelTool from "@/components/tools/CompressExcelTool";
+import CompressPowerPointTool from "@/components/tools/CompressPowerPointTool";
+import WordToPdfTool from "@/components/tools/WordToPdfTool";
+import ExcelToPdfTool from "@/components/tools/ExcelToPdfTool";
+import PowerPointToPdfTool from "@/components/tools/PowerPointToPdfTool";
+
 
 
 export type Category = "Organize" | "Convert" | "Edit & Sign" | "Optimize" | "Advanced" | "Media";
@@ -64,6 +71,13 @@ export const TOOLS: Tool[] = [
   { id: "fill-forms", name: "Fill Forms", description: "Fill native AcroForm form fields.", tagline: "We detected the form fields — just type.", category: "Edit & Sign", icon: "forms", Component: FormFillTool },
   // Optimize
   { id: "compress", name: "Compress PDF", description: "Shrink file size while keeping it crisp.", tagline: "We'll find the sweet spot between size and quality.", category: "Optimize", icon: "compress", Component: CompressTool },
+
+  { id: "compress-word", name: "Compress Word", description: "Reduce Word document file size.", tagline: "Compress Word documents.", category: "Optimize", icon: "compress", Component: CompressWordTool },
+  { id: "compress-excel", name: "Compress Excel / CSV", description: "Reduce Excel and CSV file size.", tagline: "Compress Excel and CSV files.", category: "Optimize", icon: "compress", Component: CompressExcelTool },
+  { id: "compress-powerpoint", name: "Compress PowerPoint", description: "Reduce PowerPoint file size.", tagline: "Compress PowerPoint presentations.", category: "Optimize", icon: "compress", Component: CompressPowerPointTool },
+  { id: "word-to-pdf", name: "Word → PDF", description: "Convert Word documents to PDF.", tagline: "Convert Word to PDF.", category: "Convert", icon: "type", Component: WordToPdfTool },
+  { id: "excel-to-pdf", name: "Excel / CSV → PDF", description: "Convert Excel and CSV to PDF.", tagline: "Convert Excel and CSV to PDF.", category: "Convert", icon: "type", Component: ExcelToPdfTool },
+  { id: "powerpoint-to-pdf", name: "PowerPoint → PDF", description: "Convert PowerPoint to PDF.", tagline: "Convert PowerPoint to PDF.", category: "Convert", icon: "type", Component: PowerPointToPdfTool },
 
   // Advanced (Phase 3)
   { id: "pdf-to-excel", name: "PDF → Excel", description: "Extract tables and data to spreadsheets.", tagline: "Extract tables into Excel.", category: "Advanced", icon: "type", Component: PdfToExcelTool },

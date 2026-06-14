@@ -10,29 +10,11 @@ export default function RemoveBackgroundTool() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"original" | "removed">("removed");
   const [bgColor, setBgColor] = useState<string>("transparent");
-
-  // Create original preview URL when file changes
-  useEffect(() => {
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setOriginalUrl(url);
-      setProcessedUrl(null);
-      setError(null);
-      setViewMode("removed");
-
-      // Auto-process on load
-      processImage(file);
-
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setOriginalUrl(null);
-      setProcessedUrl(null);
-    }
-  }, [file]);
 
   const processImage = async (imgFile: File) => {
     setProcessing(true);
@@ -42,12 +24,38 @@ export default function RemoveBackgroundTool() {
       const url = URL.createObjectURL(blob);
       setProcessedUrl(url);
       setViewMode("removed");
-    } catch (e: any) {
-      setError(e.message || "Failed to remove background.");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to remove background.");
     } finally {
       setProcessing(false);
     }
   };
+
+
+  // We use handleFileChange to avoid setStates in useEffect
+  const handleFileChange = (files: File[]) => {
+    const newFile = files[0];
+    if (newFile) {
+        setFile(newFile);
+        const url = URL.createObjectURL(newFile);
+        setOriginalUrl(url);
+        setProcessedUrl(null);
+        setError(null);
+        setViewMode("removed");
+        processImage(newFile);
+    }
+  }
+
+  useEffect(() => {
+     return () => {
+         if (originalUrl) URL.revokeObjectURL(originalUrl);
+         if (processedUrl) URL.revokeObjectURL(processedUrl);
+     }
+  }, [originalUrl, processedUrl])
+
+
+
+
 
 
   const handleDownload = async () => {
@@ -103,7 +111,7 @@ export default function RemoveBackgroundTool() {
       {!file && (
         <FileDrop
           accept="image/png,image/jpeg,image/webp"
-          onFiles={(files) => setFile(files[0])}
+          onFiles={handleFileChange}
           multiple={false}
         />
       )}
