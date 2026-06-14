@@ -6,9 +6,7 @@ import { formatBytes } from "@/lib/pdf";
 import { Banner, RangeField } from "@/components/ui";
 import html2canvas from "html2canvas";
 
-
 export default function HTMLToImageTool() {
-
   const [htmlString, setHtmlString] = useState("<h2>Hello World</h2><p>This is a test.</p>");
   const [padding, setPadding] = useState(16);
   const [bgColor, setBgColor] = useState("#ffffff");
@@ -24,6 +22,7 @@ export default function HTMLToImageTool() {
       const canvas = await html2canvas(containerRef.current, {
         useCORS: true,
         scale: 2,
+        // KUNCI: backgroundColor harus null agar html2canvas menghasilkan alpha channel (transparan)
         backgroundColor: bgColor === "transparent" ? null : bgColor,
       });
 
@@ -43,7 +42,6 @@ export default function HTMLToImageTool() {
     }
   };
 
-
   return (
     <div className="stack" style={{ gap: "var(--s-5)" }}>
       <div className="panel">
@@ -53,9 +51,20 @@ export default function HTMLToImageTool() {
             <div className="field">
                 <label>Background Color</label>
                 <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                    <input type="color" className="input" style={{padding: '0', height: '38px', width: '60px'}} value={bgColor === "transparent" ? "#ffffff" : bgColor} onChange={e => setBgColor(e.target.value)} disabled={bgColor === "transparent"} />
+                    <input 
+                      type="color" 
+                      className="input" 
+                      style={{padding: '0', height: '38px', width: '60px'}} 
+                      value={bgColor === "transparent" ? "#ffffff" : bgColor} 
+                      onChange={e => setBgColor(e.target.value)} 
+                      disabled={bgColor === "transparent"} 
+                    />
                     <label className="check" style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0}}>
-                        <input type="checkbox" checked={bgColor === "transparent"} onChange={(e) => setBgColor(e.target.checked ? "transparent" : "#ffffff")} />
+                        <input 
+                          type="checkbox" 
+                          checked={bgColor === "transparent"} 
+                          onChange={(e) => setBgColor(e.target.checked ? "transparent" : "#ffffff")} 
+                        />
                         <span>Transparent</span>
                     </label>
                 </div>
@@ -79,8 +88,16 @@ export default function HTMLToImageTool() {
 
         <div className="field">
             <label>Preview (This will be captured)</label>
-            <div className="border rounded bg-white text-black overflow-auto relative max-w-full w-full checkerboard" style={{ padding: `${padding}px`, backgroundColor: bgColor === "transparent" ? undefined : bgColor }}>
-                <div ref={containerRef} dangerouslySetInnerHTML={{ __html: htmlString }} className="inline-block" />
+            {/* PERBAIKAN: ref dipindahkan ke sini agar padding & background ikut terfoto */}
+            <div 
+                ref={containerRef}
+                className={`border rounded text-black overflow-auto relative max-w-full w-full ${bgColor === "transparent" ? "checkerboard" : ""}`} 
+                style={{ 
+                    padding: `${padding}px`, 
+                    backgroundColor: bgColor === "transparent" ? "transparent" : bgColor 
+                }}
+            >
+                <div dangerouslySetInnerHTML={{ __html: htmlString }} className="inline-block" />
             </div>
         </div>
 
@@ -107,6 +124,7 @@ export default function HTMLToImageTool() {
               linear-gradient(-45deg, transparent 75%, #ccc 75%);
             background-size: 20px 20px;
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-color: white; /* Base color untuk checkerboard */
         }
       `}</style>
     </div>
