@@ -96,9 +96,9 @@ export default function BlurFaceTool() {
       a.download = `blurred_${file.name}`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch(err: any) {
+    } catch(err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to process image.");
+      setError(err instanceof Error ? err.message : "Failed to process image.");
     } finally {
       setProcessing(false);
     }
@@ -122,7 +122,7 @@ export default function BlurFaceTool() {
                   <label className="text-sm font-medium mb-1 block">Effect Mode</label>
                   <Segmented
                       value={mode}
-                      onChange={(v: any) => setMode(v)}
+                      onChange={(v) => setMode(v)}
                       options={[
                         { value: "blur", label: "Gaussian Blur" },
                         { value: "censor", label: "Black Censor Box" },

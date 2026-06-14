@@ -67,8 +67,8 @@ export default function PDFToHTMLTool() {
       a.download = file.name.replace(/\.pdf$/i, ".html");
       a.click();
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message || "Failed to process PDF.");
+    } catch (e: unknown) {
+      setError((e instanceof Error ? e.message : "Failed to process PDF."));
     } finally {
       setProcessing(false);
     }
@@ -90,7 +90,7 @@ export default function PDFToHTMLTool() {
             <label className="text-sm font-medium">Extraction Mode</label>
             <Segmented
               value={mode}
-              onChange={(v: any) => setMode(v)}
+              onChange={(v) => setMode(v)}
               options={[
                 { value: "text", label: "Text Only (Semantic)" },
                 { value: "images", label: "High Fidelity (Images)" },
