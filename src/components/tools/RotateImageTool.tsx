@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { FileDrop, RunButton } from "@/components/pdfui";
+import { formatBytes } from "@/lib/pdf";
 import { Segmented } from "@/components/ui";
 
 export default function RotateImageTool() {
@@ -65,14 +66,14 @@ export default function RotateImageTool() {
   };
 
   return (
-    <div className="tool-container flex flex-col gap-6">
+    <div className="stack" style={{ gap: "var(--s-5)" }}>
       <FileDrop
         accept="image/png,image/jpeg,image/webp"
         onFiles={(files) => setFile(files[0])}
         multiple={false}
       />
       {imgSrc && (
-        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow items-center overflow-hidden w-full">
+        <div className="panel">
 
           <div style={{ transform: `rotate(${rotation}deg) scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`, transition: 'transform 0.3s ease' }} className="max-w-full overflow-hidden flex justify-center">
             <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '300px', maxWidth: '100%', objectFit: 'contain' }} />

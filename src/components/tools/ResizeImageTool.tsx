@@ -74,14 +74,14 @@ export default function ResizeImageTool() {
   };
 
   return (
-    <div className="tool-container flex flex-col gap-6">
+    <div className="stack" style={{ gap: "var(--s-5)" }}>
       <FileDrop
         accept="image/png,image/jpeg,image/webp"
         onFiles={(files) => setFile(files[0])}
         multiple={false}
       />
       {imgSrc && (
-        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow">
+        <div className="panel">
           <img ref={imgRef} src={imgSrc} onLoad={onImageLoad} alt="Original" style={{ maxHeight: '300px', maxWidth: '100%', objectFit: 'contain' }} />
 
 

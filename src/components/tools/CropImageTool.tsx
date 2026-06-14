@@ -93,14 +93,14 @@ export default function CropImageTool() {
   };
 
   return (
-    <div className="tool-container flex flex-col gap-6">
+    <div className="stack" style={{ gap: "var(--s-5)" }}>
       <FileDrop
         accept="image/png,image/jpeg,image/webp"
         onFiles={(files) => setFile(files[0])}
         multiple={false}
       />
       {imgSrc && (
-        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow overflow-hidden w-full">
+        <div className="panel">
 
           <div className="w-full flex flex-col gap-2 mb-4 max-w-sm mx-auto">
             <label className="text-sm font-medium">Aspect Ratio</label>

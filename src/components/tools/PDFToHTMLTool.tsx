@@ -3,21 +3,38 @@
 import { useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import { FileDrop } from "@/components/pdfui";
+import { formatBytes } from "@/lib/pdf";
 import { Banner, Segmented } from "@/components/ui";
 import { RunButton } from "@/components/pdfui";
 
+
+interface Loaded {
+  name: string;
+  bytes: ArrayBuffer;
+  size: number;
+}
 export default function PDFToHTMLTool() {
-  const [file, setFile] = useState<File | null>(null);
+  const [doc, setDoc] = useState<Loaded | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<"text" | "images">("text");
 
+
+
+  const load = (files: File[]) => {
+    const f = files[0];
+    if (!f) return;
+    setError(null);
+    f.arrayBuffer().then((bytes) => setDoc({ name: f.name, bytes, size: f.size }));
+  };
+
   const handleProcess = async () => {
-    if (!file) return;
+    if (!doc) return;
+
     setProcessing(true);
     setError(null);
     try {
-      const arrayBuffer = await file.arrayBuffer();
+      const arrayBuffer = doc.bytes;
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
       const numPages = pdf.numPages;
 
@@ -25,7 +42,7 @@ export default function PDFToHTMLTool() {
 <html>
 <head>
 <meta charset="utf-8">
-<title>${file.name.replace(/\.pdf$/i, "")}</title>
+<title>${doc.name.replace(/\.pdf$/i, "")}</title>
 <style>
   body { font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 20px; }
   .page { background: white; margin: 0 auto 20px auto; padding: 40px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 800px; }
@@ -64,7 +81,7 @@ export default function PDFToHTMLTool() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = file.name.replace(/\.pdf$/i, ".html");
+      a.download = doc.name.replace(/\.pdf$/i, ".html");
       a.click();
       URL.revokeObjectURL(url);
     } catch (e: unknown) {
@@ -74,35 +91,55 @@ export default function PDFToHTMLTool() {
     }
   };
 
-  return (
-    <div className="tool-container flex flex-col gap-6">
+
+  if (!doc) {
+    return (
       <FileDrop
         accept="application/pdf"
-        onFiles={(files) => setFile(files[0])}
+        onFiles={load}
         multiple={false}
+        icon="type"
+        title={<>Drop a PDF or <span className="em">browse</span></>}
+        sub="Convert PDF content to HTML."
       />
-      {error && <Banner kind="error">{error}</Banner>}
-      {file && (
-        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow">
+    );
+  }
 
-          <p>Selected: {file.name}</p>
-          <div className="flex flex-col gap-1 w-full max-w-sm mb-2">
-            <label className="text-sm font-medium">Extraction Mode</label>
-            <Segmented
-              value={mode}
-              onChange={(v) => setMode(v)}
-              options={[
-                { value: "text", label: "Text Only (Semantic)" },
-                { value: "images", label: "High Fidelity (Images)" },
-              ]}
-              block
-            />
-          </div>
-
-          <RunButton onClick={handleProcess} disabled={processing} busy={processing} icon="type">
-            {processing ? "Converting..." : "Convert to HTML"}
-          </RunButton>
+  return (
+    <div className="stack" style={{ gap: "var(--s-5)" }}>
+      <div className="panel">
+        <div className="panel-title with-sub">{doc.name}</div>
+        <div className="panel-sub">{formatBytes(doc.size)} loaded</div>
+        <div className="field">
+          <label>Extraction Mode</label>
+          <Segmented
+            value={mode}
+            onChange={(v) => setMode(v)}
+            options={[
+              { value: "text", label: "Text Only (Semantic)" },
+              { value: "images", label: "High Fidelity (Images)" },
+            ]}
+          />
         </div>
+      </div>
+
+      <Banner kind="info" title="How this works">
+        Extracts textual content and attempts to map it to HTML. Formatting may not perfectly match the original PDF structure.
+      </Banner>
+
+      <div className="run-bar">
+        <RunButton onClick={handleProcess} disabled={processing} busy={processing} icon="type">
+          {processing ? "Converting..." : "Convert to HTML"}
+        </RunButton>
+        <button type="button" className="btn btn-ghost" onClick={() => setDoc(null)} disabled={processing}>
+          Choose another
+        </button>
+      </div>
+
+      {error && (
+        <Banner kind="error" title="Couldn't process">
+          {error}
+        </Banner>
       )}
     </div>
   );

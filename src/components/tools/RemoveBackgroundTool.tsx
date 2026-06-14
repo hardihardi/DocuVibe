@@ -107,7 +107,7 @@ export default function RemoveBackgroundTool() {
   const currentImg = viewMode === "original" ? originalUrl : (processedUrl || originalUrl);
 
   return (
-    <div className="tool-container flex flex-col gap-6 w-full max-w-4xl mx-auto">
+    <div className="stack" style={{ gap: "var(--s-5)" }}>
       {!file && (
         <FileDrop
           accept="image/png,image/jpeg,image/webp"

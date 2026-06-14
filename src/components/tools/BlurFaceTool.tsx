@@ -105,7 +105,7 @@ export default function BlurFaceTool() {
   };
 
   return (
-    <div className="tool-container flex flex-col gap-6">
+    <div className="stack" style={{ gap: "var(--s-5)" }}>
       <FileDrop
         accept="image/png,image/jpeg,image/webp"
         onFiles={(files) => setFile(files[0])}
@@ -113,7 +113,7 @@ export default function BlurFaceTool() {
       />
       {error && <Banner kind="error">{error}</Banner>}
       {imgSrc && (
-        <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900 p-4 rounded shadow items-center">
+        <div className="panel">
 
           <img ref={imgRef} src={imgSrc} alt="Preview" style={{ maxHeight: '400px', maxWidth: '100%', objectFit: 'contain', width: 'auto' }} crossOrigin="anonymous" />
 
