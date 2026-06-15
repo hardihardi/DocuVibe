@@ -4,7 +4,7 @@ A local, **privacy-first PDF toolkit** in a retro-terminal UI. Merge, split,
 organize, rotate, and convert PDFs — entirely in your browser. Your files are
 **never uploaded**: no server, no tracking, no accounts.
 
-Part of the Don\* tool family — shares its stack and design system with
+Part of the Docuvibe tools family — shares its stack and design system with
 [Docuvibe](https://github.com/hardihardi/docuvibe).
 
 ## Tools (Phase 1)
