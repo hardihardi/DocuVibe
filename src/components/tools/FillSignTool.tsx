@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import {
@@ -9,7 +11,7 @@ import {
   type PointerEvent as RPointerEvent,
 } from "react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { FileDrop, ProgressBar, RunButton } from "@/components/pdfui";
+import {  FileDrop, ProgressBar, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, Icon, Modal, RangeField, cx } from "@/components/ui";
 import { baseName, downloadBlob, hexToRgb, openPdfjsDoc, renderPageToBlob } from "@/lib/pdf";
 
@@ -288,7 +290,7 @@ export default function FillSignTool() {
           style={{ aspectRatio: `${pages[cur].ptW} / ${pages[cur].ptH}`, width: "100%", maxWidth: 540, containerType: "size" } as CSSProperties}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
+          { }
           <img src={pages[cur].url} alt={`Page ${cur + 1}`} draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
           {anns.filter((a) => a.page === cur).map((a) => {
             const isSel = a.id === selected;
@@ -303,7 +305,7 @@ export default function FillSignTool() {
               >
                 {a.type === "sig" ? (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- local signature dataURL */}
+                    { }
                     <img src={a.img} alt="signature" draggable={false} style={{ width: `${(a.wFrac ?? 0.3) * 100}cqw`, height: "auto", display: "block" }} />
                     {isSel && <span className="handle br" onPointerDown={(e) => onPointerDown(e, a, "resize")} />}
                   </>

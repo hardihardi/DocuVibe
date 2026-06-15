@@ -239,3 +239,99 @@
 .result-foot .file-name { flex: 1; font-size: var(--text-xs); }
 .result-foot .icon-btn { width: 30px; height: 30px; color: var(--accent); }
 .result-foot .icon-btn:hover { background: var(--accent-subtle); }
+
+/* Detailed Preview */
+.detailed-preview {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--s-5);
+}
+
+@media (min-width: 640px) {
+  .detailed-preview {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.dp-visual {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .dp-visual {
+    width: 280px;
+    height: auto;
+    aspect-ratio: auto;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+}
+
+.dp-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: var(--s-3);
+  background: var(--surface-3); /* checkerboard maybe better, but surface-3 is okay */
+}
+
+.dp-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.dp-loading, .dp-icon {
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--text-sm);
+}
+
+.dp-info {
+  flex: 1;
+  padding: var(--s-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+.dp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-4);
+}
+
+.dp-name {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+.dp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: auto;
+}

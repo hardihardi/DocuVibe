@@ -1,9 +1,11 @@
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import JSZip from "jszip";
 import { PDFDocument, rgb } from "pdf-lib";
-import { FileDrop, RunButton } from "@/components/pdfui";
+import {  FileDrop, RunButton , DetailedPreview } from "@/components/pdfui";
 import { formatBytes } from "@/lib/pdf";
 import { Banner } from "@/components/ui";
 
@@ -112,8 +114,7 @@ export default function PowerPointToPdfTool() {
   return (
     <div className="stack" style={{ gap: "var(--s-5)" }}>
       <div className="panel">
-        <div className="panel-title with-sub">{doc.name}</div>
-        <div className="panel-sub">{formatBytes(doc.size)} loaded</div>
+        <DetailedPreview name={doc.name} data={doc.bytes} size={doc.size} onRemove={() => setDoc(null)} />
       </div>
 
       <Banner kind="info" title="How this works">

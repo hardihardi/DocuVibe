@@ -1,8 +1,10 @@
+
+
 "use client";
 
 import { useState } from "react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { FileDrop, RunButton } from "@/components/pdfui";
+import {  FileDrop, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, Segmented } from "@/components/ui";
 import { baseName, downloadBlob, parsePageRange } from "@/lib/pdf";
 
@@ -95,8 +97,7 @@ export default function PageNumbersTool() {
   return (
     <div className="stack" style={{ gap: "var(--s-5)" }}>
       <div className="panel">
-        <div className="panel-title with-sub">{doc.name}</div>
-        <div className="panel-sub">{doc.pages} pages loaded</div>
+        <DetailedPreview name={doc.name} data={doc.bytes} meta={`${doc.pages} pages`} onRemove={() => setDoc(null)} />
 
         <div className="field-row">
           <div className="field">
