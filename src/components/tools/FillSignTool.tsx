@@ -170,26 +170,42 @@ export default function FillSignTool() {
   };
 
   useEffect(() => {
-    const move = (e: MouseEvent) => {
+    const move = (e: MouseEvent | TouchEvent) => {
       const d = dragRef.current;
       if (!d) return;
+
+      let clientX, clientY;
+      if ('touches' in e) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
       if (d.mode === "move") {
-        const nx = Math.max(0, Math.min(0.99, d.ox + (e.clientX - d.startX) / d.w));
-        const ny = Math.max(0, Math.min(0.99, d.oy + (e.clientY - d.startY) / d.h));
+        const nx = Math.max(0, Math.min(0.99, d.ox + (clientX - d.startX) / d.w));
+        const ny = Math.max(0, Math.min(0.99, d.oy + (clientY - d.startY) / d.h));
         update(d.id, { xFrac: nx, yFrac: ny });
       } else {
-        const nw = Math.max(0.05, Math.min(1, d.ox + (e.clientX - d.startX) / d.w));
+        const nw = Math.max(0.05, Math.min(1, d.ox + (clientX - d.startX) / d.w));
         update(d.id, { wFrac: nw });
       }
     };
     const up = () => {
       dragRef.current = null;
     };
-    window.addEventListener("mousemove", move);
+
+    window.addEventListener("mousemove", move as EventListener);
     window.addEventListener("mouseup", up);
+    window.addEventListener("touchmove", move as EventListener, { passive: false });
+    window.addEventListener("touchend", up);
+
     return () => {
-      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mousemove", move as EventListener);
       window.removeEventListener("mouseup", up);
+      window.removeEventListener("touchmove", move as EventListener);
+      window.removeEventListener("touchend", up);
     };
   }, [update]);
 
