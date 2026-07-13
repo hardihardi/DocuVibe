@@ -1,8 +1,10 @@
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import { createWorker } from "tesseract.js";
-import { FileDrop, ProgressBar, RunButton } from "@/components/pdfui";
+import {  FileDrop, ProgressBar, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner } from "@/components/ui";
 import { baseName, downloadBlob, openPdfjsDoc, renderPageToBlob } from "@/lib/pdf";
 

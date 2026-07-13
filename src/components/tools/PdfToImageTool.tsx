@@ -1,8 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import JSZip from "jszip";
-import { FileDrop, ProgressBar, RunButton } from "@/components/pdfui";
+import {  FileDrop, ProgressBar, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, Icon, Segmented } from "@/components/ui";
 import {
   baseName,
@@ -169,7 +171,7 @@ export default function PdfToImageTool() {
         <div className="result-grid">
           {results.map((r) => (
             <div className="result-card" key={r.page}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- local object URL preview */}
+              { }
               <img
                 src={r.url}
                 alt={`Page ${r.page}`}

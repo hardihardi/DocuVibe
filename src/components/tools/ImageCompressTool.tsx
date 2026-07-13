@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
-import { FileDrop, RunButton } from "@/components/pdfui";
+import {  FileDrop, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, RangeField } from "@/components/ui";
 import { baseName, downloadBlob, formatBytes } from "@/lib/pdf";
 
@@ -113,7 +115,7 @@ export default function ImageCompressTool() {
         <div className="panel">
           <div className="panel-title">Preview</div>
           <div className="crop-preview" style={{ aspectRatio: `${img.w} / ${img.h}`, width: 260 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img src={img.dataUrl} alt="preview" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", background: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\"><rect width=\"10\" height=\"10\" fill=\"%23ddd\"/><rect x=\"10\" width=\"10\" height=\"10\" fill=\"%23eee\"/><rect y=\"10\" width=\"10\" height=\"10\" fill=\"%23eee\"/><rect x=\"10\" y=\"10\" width=\"10\" height=\"10\" fill=\"%23ddd\"/></svg>') repeat" }} />
           </div>
         </div>

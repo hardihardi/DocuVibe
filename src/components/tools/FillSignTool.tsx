@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import {
@@ -9,7 +11,7 @@ import {
   type PointerEvent as RPointerEvent,
 } from "react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { FileDrop, ProgressBar, RunButton } from "@/components/pdfui";
+import {  FileDrop, ProgressBar, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, Icon, Modal, RangeField, cx } from "@/components/ui";
 import { baseName, downloadBlob, hexToRgb, openPdfjsDoc, renderPageToBlob } from "@/lib/pdf";
 
@@ -36,6 +38,31 @@ interface Ann {
 const uid = () => Math.random().toString(36).slice(2);
 
 export default function FillSignTool() {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: "sig" | "stamp") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      setAnns((p) => [
+        ...p,
+        {
+          id: uid(),
+          page: cur,
+          type: "sig",
+          img: url,
+          aspect: img.width / img.height,
+          wFrac: kind === "stamp" ? 0.15 : 0.3,
+          xFrac: 0.1,
+          yFrac: 0.1,
+        },
+      ]);
+    };
+    img.src = url;
+    e.target.value = "";
+  };
+
+
   const [name, setName] = useState("");
   const [bytes, setBytes] = useState<ArrayBuffer | null>(null);
   const [pages, setPages] = useState<RPage[]>([]);
@@ -235,29 +262,64 @@ export default function FillSignTool() {
 
   return (
     <div className="editor-shell">
-      <div className="editor-toolbar">
-        <button type="button" className="tool-pill" onClick={() => addText("Text", "text")}>
-          <Icon name="type" size={16} /> Text
-        </button>
-        <button type="button" className="tool-pill" onClick={() => addText(today, "date")}>
-          <Icon name="calendar" size={16} /> Date
-        </button>
-        <button type="button" className="tool-pill" onClick={() => (lastSig ? addSignature(lastSig.img, lastSig.aspect) : setPadOpen(true))}>
-          <Icon name="sign" size={16} /> Signature
-        </button>
-        {lastSig && (
-          <button type="button" className="tool-pill" onClick={() => setPadOpen(true)}>
-            Draw new
-          </button>
-        )}
+
+      <div className="editor-toolbar" style={{ alignItems: "stretch", padding: "12px", gap: "20px" }}>
+
+        {/* Tanda Tangan Group */}
+        <div className="toolbar-group">
+          <div className="toolbar-group-label">Tanda Tangan</div>
+          <div className="toolbar-actions">
+            <button type="button" className="tool-pill" onClick={() => setPadOpen(true)}>
+              <Icon name="sign" size={16} /> + Buat Tanda Tangan
+            </button>
+            <span style={{ fontSize: "12px", color: "var(--text-muted)", alignSelf: "center" }}>atau</span>
+            <label className="tool-pill" style={{ cursor: "pointer", margin: 0 }}>
+              <Icon name="upload" size={16} /> + Unggah Tanda Tangan
+              <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, "sig")} />
+            </label>
+          </div>
+        </div>
+
+        <span className="sep" style={{ height: "auto" }} />
+
+        {/* Stempel Group */}
+        <div className="toolbar-group">
+          <div className="toolbar-group-label">Stempel &amp; Materai</div>
+          <div className="toolbar-actions">
+            <label className="tool-pill" style={{ cursor: "pointer", margin: 0 }}>
+              <Icon name="plus" size={16} /> + Tambah Stempel
+              <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, "stamp")} />
+            </label>
+          </div>
+        </div>
+
+        <span className="sep" style={{ height: "auto" }} />
+
+        {/* Basic Tools Group */}
+        <div className="toolbar-group">
+          <div className="toolbar-group-label">Teks &amp; Tanggal</div>
+          <div className="toolbar-actions">
+            <button type="button" className="tool-pill" onClick={() => addText("Teks", "text")}>
+              <Icon name="type" size={16} /> Teks
+            </button>
+            <button type="button" className="tool-pill" onClick={() => addText(today, "date")}>
+              <Icon name="calendar" size={16} /> Tanggal
+            </button>
+          </div>
+        </div>
 
         {sel && (sel.type === "text" || sel.type === "date") && (
           <>
-            <span className="sep" />
-            <div style={{ width: 120 }}>
-              <RangeField value={Math.round((sel.fsFrac ?? 0.025) * 1000)} min={12} max={60} onChange={(v) => update(sel.id, { fsFrac: v / 1000 })} fmt={(v) => `${v}`} />
+            <span className="sep" style={{ height: "auto" }} />
+            <div className="toolbar-group">
+              <div className="toolbar-group-label">Format</div>
+              <div className="toolbar-actions" style={{ alignItems: "center" }}>
+                <div style={{ width: 100 }}>
+                  <RangeField value={Math.round((sel.fsFrac ?? 0.025) * 1000)} min={12} max={60} onChange={(v) => update(sel.id, { fsFrac: v / 1000 })} fmt={(v) => `${v}`} />
+                </div>
+                <input type="color" className="color-swatch" value={sel.color ?? "#1a1a2e"} onChange={(e) => update(sel.id, { color: e.target.value })} aria-label="Text color" />
+              </div>
             </div>
-            <input type="color" className="color-swatch" value={sel.color ?? "#1a1a2e"} onChange={(e) => update(sel.id, { color: e.target.value })} aria-label="Text color" />
           </>
         )}
 
@@ -288,7 +350,7 @@ export default function FillSignTool() {
           style={{ aspectRatio: `${pages[cur].ptW} / ${pages[cur].ptH}`, width: "100%", maxWidth: 540, containerType: "size" } as CSSProperties}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
+          { }
           <img src={pages[cur].url} alt={`Page ${cur + 1}`} draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
           {anns.filter((a) => a.page === cur).map((a) => {
             const isSel = a.id === selected;
@@ -303,7 +365,7 @@ export default function FillSignTool() {
               >
                 {a.type === "sig" ? (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- local signature dataURL */}
+                    { }
                     <img src={a.img} alt="signature" draggable={false} style={{ width: `${(a.wFrac ?? 0.3) * 100}cqw`, height: "auto", display: "block" }} />
                     {isSel && <span className="handle br" onPointerDown={(e) => onPointerDown(e, a, "resize")} />}
                   </>

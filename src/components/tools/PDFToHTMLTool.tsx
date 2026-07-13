@@ -1,8 +1,10 @@
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
-import { FileDrop } from "@/components/pdfui";
+import {  FileDrop , DetailedPreview } from "@/components/pdfui";
 import { formatBytes } from "@/lib/pdf";
 import { Banner, Segmented } from "@/components/ui";
 import { RunButton } from "@/components/pdfui";
@@ -108,8 +110,7 @@ export default function PDFToHTMLTool() {
   return (
     <div className="stack" style={{ gap: "var(--s-5)" }}>
       <div className="panel">
-        <div className="panel-title with-sub">{doc.name}</div>
-        <div className="panel-sub">{formatBytes(doc.size)} loaded</div>
+        <DetailedPreview name={doc.name} data={doc.bytes} size={doc.size} onRemove={() => setDoc(null)} />
         <div className="field">
           <label>Extraction Mode</label>
           <Segmented

@@ -1,8 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import { PDFDocument } from "pdf-lib";
-import { FileDrop, RunButton } from "@/components/pdfui";
+import {  FileDrop, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, Segmented } from "@/components/ui";
 import { baseName, downloadBlob, openPdfjsDoc, parsePageRange, renderThumbnail } from "@/lib/pdf";
 
@@ -127,7 +129,7 @@ export default function CropTool() {
         <div className="panel">
           <div className="panel-title">Preview · page 1</div>
           <div className="crop-preview" style={{ aspectRatio: `${doc.ptW} / ${doc.ptH}`, width: 260 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- local data-URL preview */}
+            { }
             <img src={doc.thumb} alt="page 1 preview" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
             <div
               className="crop-box"

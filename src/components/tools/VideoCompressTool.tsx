@@ -1,9 +1,11 @@
+
+
 "use client";
 
 import { useState, useRef } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
-import { FileDrop, ProgressBar, RunButton } from "@/components/pdfui";
+import {  FileDrop, ProgressBar, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, RangeField } from "@/components/ui";
 import { baseName, downloadBlob, formatBytes } from "@/lib/pdf";
 
@@ -105,8 +107,7 @@ export default function VideoCompressTool() {
   return (
     <div className="stack" style={{ gap: "var(--s-5)" }}>
       <div className="panel">
-        <div className="panel-title with-sub">{file.name}</div>
-        <div className="panel-sub">{formatBytes(file.size)}</div>
+        <DetailedPreview file={file} onRemove={() => setFile(null)} />
 
         <div className="field" style={{ marginTop: "var(--s-5)", marginBottom: 0 }}>
           <label>Compression Level (CRF)</label>

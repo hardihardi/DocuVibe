@@ -224,3 +224,23 @@
 .theme-btn-home .moon-icon { display: block; }
 [data-theme="dark"] .theme-btn-home .sun-icon { display: block; }
 [data-theme="dark"] .theme-btn-home .moon-icon { display: none; }
+
+/* FillSign Toolbar additions */
+.toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.toolbar-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}

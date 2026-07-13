@@ -1,8 +1,10 @@
+
+
 "use client";
 
 import { useState } from "react";
 import { PDFDocument } from "pdf-lib";
-import { FileDrop, ProgressBar, RunButton } from "@/components/pdfui";
+import {  FileDrop, ProgressBar, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, Segmented } from "@/components/ui";
 import { baseName, downloadBlob, formatBytes, openPdfjsDoc, renderPageToBlob } from "@/lib/pdf";
 
@@ -99,8 +101,7 @@ export default function CompressTool() {
   return (
     <div className="stack" style={{ gap: "var(--s-5)" }}>
       <div className="panel">
-        <div className="panel-title with-sub">{doc.name}</div>
-        <div className="panel-sub">{formatBytes(doc.size)} loaded</div>
+        <DetailedPreview name={doc.name} data={doc.bytes} size={doc.size} onRemove={() => setDoc(null)} />
         <div className="field">
           <label>Compression level</label>
           <Segmented

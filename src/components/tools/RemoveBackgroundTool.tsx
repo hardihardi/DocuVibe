@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileDrop, RunButton } from "@/components/pdfui";
+import {  FileDrop, RunButton , DetailedPreview } from "@/components/pdfui";
 import { removeBackground } from "@imgly/background-removal";
 import { Banner, Icon, Segmented } from "@/components/ui";
 
