@@ -11,7 +11,7 @@ import {
   type PointerEvent as RPointerEvent,
 } from "react";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import { FileDrop, ProgressBar, RunButton } from "@/components/pdfui";
+import {  FileDrop, ProgressBar, RunButton , DetailedPreview } from "@/components/pdfui";
 import { Banner, Icon, Modal, RangeField, cx } from "@/components/ui";
 import { baseName, downloadBlob, hexToRgb, openPdfjsDoc, renderPageToBlob } from "@/lib/pdf";
 
@@ -38,32 +38,6 @@ interface Ann {
 const uid = () => Math.random().toString(36).slice(2);
 
 export default function FillSignTool() {
-  const [name, setName] = useState("");
-  const [bytes, setBytes] = useState<ArrayBuffer | null>(null);
-  const [pages, setPages] = useState<RPage[]>([]);
-  const [cur, setCur] = useState(0);
-  const [anns, setAnns] = useState<Ann[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [editing, setEditing] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const [padOpen, setPadOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"signature" | "stamp" | "text">("signature");
-  const [note, setNote] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
-
-  const pageBoxRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<null | {
-    id: string;
-    startX: number;
-    startY: number;
-    ox: number;
-    oy: number;
-    w: number;
-    h: number;
-    mode: "move" | "resize";
-  }>(null);
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: "sig" | "stamp") => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -78,7 +52,7 @@ export default function FillSignTool() {
           type: "sig",
           img: url,
           aspect: img.width / img.height,
-          wFrac: kind === "stamp" ? 0.20 : 0.3,
+          wFrac: kind === "stamp" ? 0.15 : 0.3,
           xFrac: 0.1,
           yFrac: 0.1,
         },
@@ -88,20 +62,48 @@ export default function FillSignTool() {
     e.target.value = "";
   };
 
+
+  const [name, setName] = useState("");
+  const [bytes, setBytes] = useState<ArrayBuffer | null>(null);
+  const [pages, setPages] = useState<RPage[]>([]);
+  const [cur, setCur] = useState(0);
+  const [anns, setAnns] = useState<Ann[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [padOpen, setPadOpen] = useState(false);
+  const [lastSig, setLastSig] = useState<{ img: string; aspect: number } | null>(null);
+  const [note, setNote] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
+
+  const pageBoxRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<null | {
+    id: string;
+    startX: number;
+    startY: number;
+    ox: number;
+    oy: number;
+    w: number;
+    h: number;
+    mode: "move" | "resize";
+  }>(null);
+
   const load = async (files: File[]) => {
     const file = files[0];
     if (!file) return;
     setNote(null);
     setLoading(true);
     setProgress(0);
+    setPages([]);
     try {
       const buf = await file.arrayBuffer();
       const doc = await openPdfjsDoc(buf);
       const total = doc.numPages;
       const out: RPage[] = [];
       for (let i = 1; i <= total; i++) {
-        const r = await renderPageToBlob(doc, i, { scale: 1.5, type: "image/jpeg", quality: 0.8 });
-        out.push({ url: URL.createObjectURL(r.blob), ptW: r.width / 1.5, ptH: r.height / 1.5 });
+        const r = await renderPageToBlob(doc, i, { scale: 1.6, type: "image/jpeg", quality: 0.85 });
+        out.push({ url: URL.createObjectURL(r.blob), ptW: r.width / 1.6, ptH: r.height / 1.6 });
         setProgress(i / total);
       }
       doc.destroy();
@@ -111,7 +113,7 @@ export default function FillSignTool() {
       setCur(0);
       setAnns([]);
     } catch (e) {
-      setNote({ kind: "err", msg: `Load failed: ${(e as Error).message}` });
+      setNote({ kind: "err", msg: `Couldn't read PDF: ${(e as Error).message}` });
     } finally {
       setLoading(false);
     }
@@ -124,33 +126,33 @@ export default function FillSignTool() {
     setAnns([]);
     setSelected(null);
     setName("");
+    setNote(null);
   };
 
   const update = useCallback((id: string, patch: Partial<Ann>) => {
     setAnns((p) => p.map((a) => (a.id === id ? { ...a, ...patch } : a)));
   }, []);
-
   const removeAnn = (id: string) => {
     setAnns((p) => p.filter((a) => a.id !== id));
-    setSelected(null);
+    setSelected((s) => (s === id ? null : s));
   };
 
   const addText = (value: string, type: AnnType = "text") => {
-    const a: Ann = { id: uid(), page: cur, type, xFrac: 0.1, yFrac: 0.1, text: value, fsFrac: 0.025, color: "#000000" };
+    const a: Ann = { id: uid(), page: cur, type, xFrac: 0.12, yFrac: 0.12, text: value, fsFrac: 0.025, color: "#1a1a2e" };
     setAnns((p) => [...p, a]);
     setSelected(a.id);
   };
-
   const addSignature = (img: string, aspect: number) => {
-    const a: Ann = { id: uid(), page: cur, type: "sig", xFrac: 0.1, yFrac: 0.1, img, aspect, wFrac: 0.3 };
+    const a: Ann = { id: uid(), page: cur, type: "sig", xFrac: 0.12, yFrac: 0.7, img, aspect, wFrac: 0.3 };
     setAnns((p) => [...p, a]);
     setSelected(a.id);
+    setLastSig({ img, aspect });
   };
 
-  // Pointer Handlers (Move/Resize)
   const onPointerDown = (e: RPointerEvent, ann: Ann, mode: "move" | "resize") => {
     if (editing === ann.id) return;
     e.preventDefault();
+    e.stopPropagation();
     const box = pageBoxRef.current;
     if (!box) return;
     const rect = box.getBoundingClientRect();
@@ -158,7 +160,7 @@ export default function FillSignTool() {
       id: ann.id,
       startX: e.clientX,
       startY: e.clientY,
-      ox: mode === "resize" ? (ann.wFrac ?? 0.3) : ann.xFrac,
+      ox: mode === "resize" ? ann.wFrac ?? 0.3 : ann.xFrac,
       oy: ann.yFrac,
       w: rect.width,
       h: rect.height,
@@ -171,279 +173,331 @@ export default function FillSignTool() {
     const move = (e: MouseEvent | TouchEvent) => {
       const d = dragRef.current;
       if (!d) return;
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+      let clientX, clientY;
+      if ('touches' in e) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
 
       if (d.mode === "move") {
-        update(d.id, { 
-          xFrac: Math.max(0, Math.min(0.9, d.ox + (clientX - d.startX) / d.w)),
-          yFrac: Math.max(0, Math.min(0.9, d.oy + (clientY - d.startY) / d.h))
-        });
+        const nx = Math.max(0, Math.min(0.99, d.ox + (clientX - d.startX) / d.w));
+        const ny = Math.max(0, Math.min(0.99, d.oy + (clientY - d.startY) / d.h));
+        update(d.id, { xFrac: nx, yFrac: ny });
       } else {
-        update(d.id, { wFrac: Math.max(0.05, Math.min(0.8, d.ox + (clientX - d.startX) / d.w)) });
+        const nw = Math.max(0.05, Math.min(1, d.ox + (clientX - d.startX) / d.w));
+        update(d.id, { wFrac: nw });
       }
     };
-    const up = () => { dragRef.current = null; };
-    window.addEventListener("mousemove", move);
+    const up = () => {
+      dragRef.current = null;
+    };
+
+    window.addEventListener("mousemove", move as EventListener);
     window.addEventListener("mouseup", up);
-    window.addEventListener("touchmove", move, { passive: false });
+    window.addEventListener("touchmove", move as EventListener, { passive: false });
     window.addEventListener("touchend", up);
+
     return () => {
-      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mousemove", move as EventListener);
       window.removeEventListener("mouseup", up);
-      window.removeEventListener("touchmove", move);
+      window.removeEventListener("touchmove", move as EventListener);
       window.removeEventListener("touchend", up);
     };
   }, [update]);
 
   const run = async () => {
     if (!bytes) return;
+    if (anns.length === 0) {
+      setNote({ kind: "err", msg: "Add some text or a signature first." });
+      return;
+    }
     setBusy(true);
+    setNote(null);
     try {
-      const pdf = await PDFDocument.load(bytes);
+      const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
       const font = await pdf.embedFont(StandardFonts.Helvetica);
       const docPages = pdf.getPages();
+      const sigCache = new Map<string, Awaited<ReturnType<typeof pdf.embedPng>>>();
       for (const a of anns) {
         const page = docPages[a.page];
+        if (!page) continue;
         const { width: ptW, height: ptH } = page.getSize();
-        if ((a.type === "text" || a.type === "date") && a.text) {
+        if (a.type === "text" || a.type === "date") {
           const size = (a.fsFrac ?? 0.025) * ptH;
-          const { r, g, b } = hexToRgb(a.color ?? "#000000");
-          page.drawText(a.text, { x: a.xFrac * ptW, y: ptH - (a.yFrac * ptH) - size, size, font, color: rgb(r/255, g/255, b/255) });
+          const { r, g, b } = hexToRgb(a.color ?? "#1a1a2e");
+          const lines = (a.text ?? "").replace(/\r/g, "").split("\n");
+          lines.forEach((line, li) => {
+            page.drawText(line, { x: a.xFrac * ptW, y: ptH * (1 - a.yFrac) - size * (li + 1), size, font, color: rgb(r, g, b) });
+          });
         } else if (a.type === "sig" && a.img) {
-          const imgBytes = await fetch(a.img).then(res => res.arrayBuffer());
-          const png = await pdf.embedPng(imgBytes);
+          let png = sigCache.get(a.img);
+          if (!png) {
+            const buf = await (await fetch(a.img)).arrayBuffer();
+            png = await pdf.embedPng(buf);
+            sigCache.set(a.img, png);
+          }
           const w = (a.wFrac ?? 0.3) * ptW;
-          const h = w / (a.aspect ?? 1);
-          page.drawImage(png, { x: a.xFrac * ptW, y: ptH - (a.yFrac * ptH) - h, width: w, height: h });
+          const h = w * (a.aspect ?? 0.4);
+          page.drawImage(png, { x: a.xFrac * ptW, y: ptH * (1 - a.yFrac) - h, width: w, height: h });
         }
       }
-      const res = await pdf.save();
-      downloadBlob(res, `${baseName(name)}-signed.pdf`);
+      const result = await pdf.save();
+      const stem = baseName(name);
+      downloadBlob(result, `${stem}-signed.pdf`);
+      setNote({ kind: "ok", msg: `Stamped ${anns.length} item${anns.length === 1 ? "" : "s"} → ${stem}-signed.pdf` });
     } catch (e) {
-      setNote({ kind: "err", msg: (e as Error).message });
+      setNote({ kind: "err", msg: `Export failed: ${(e as Error).message}` });
     } finally {
       setBusy(false);
     }
   };
 
+  const sel = anns.find((a) => a.id === selected) ?? null;
+  const today = new Date().toLocaleDateString();
+
   if (pages.length === 0) {
     return (
-      <div className="stack">
-        <FileDrop 
-          accept="application/pdf" 
-          onFiles={load} 
-          title={loading ? "Processing..." : "Fill & Sign PDF"} 
-          sub="Add your signature, stamps, or text to any page"
+      <div className="stack" style={{ gap: "var(--s-5)" }}>
+        <FileDrop
+          accept="application/pdf"
+          multiple={false}
+          onFiles={load}
+          icon="sign"
+          title={loading ? "Rendering pages…" : <>Drop a PDF to <span className="em">fill &amp; sign</span></>}
+          sub={loading ? "One moment." : "Add text, dates, and your signature anywhere on the page."}
         />
-        {loading && <ProgressBar value={progress} />}
+        {loading && <ProgressBar value={progress} label="Loading pages" />}
+        {note && <Banner kind="error">{note.msg}</Banner>}
       </div>
     );
   }
 
   return (
     <div className="editor-shell">
-      {/* Mobile Tabs Navigation */}
-      <div className="mobile-tabs-nav show-mobile">
-        <button className={cx("tab-item", activeTab === "signature" && "active")} onClick={() => setActiveTab("signature")}>Signature</button>
-        <button className={cx("tab-item", activeTab === "stamp" && "active")} onClick={() => setActiveTab("stamp")}>Stamp</button>
-        <button className={cx("tab-item", activeTab === "text" && "active")} onClick={() => setActiveTab("text")}>Text</button>
-      </div>
 
-      <div className="editor-toolbar flex-responsive">
-        
-        {/* Signature Group */}
-        {(activeTab === "signature" || window.innerWidth > 768) && (
-          <div className="toolbar-group">
-            <div className="toolbar-label">Signature</div>
-            <div className="toolbar-actions">
-              <button className="tool-pill" onClick={() => setPadOpen(true)}>
-                <Icon name="edit" size={14} /> Draw
-              </button>
-              <label className="tool-pill pointer">
-                <Icon name="upload" size={14} /> Upload
-                <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, "sig")} />
-              </label>
-            </div>
+      <div className="editor-toolbar" style={{ alignItems: "stretch", padding: "12px", gap: "20px" }}>
+
+        {/* Tanda Tangan Group */}
+        <div className="toolbar-group">
+          <div className="toolbar-group-label">Tanda Tangan</div>
+          <div className="toolbar-actions">
+            <button type="button" className="tool-pill" onClick={() => setPadOpen(true)}>
+              <Icon name="sign" size={16} /> + Buat Tanda Tangan
+            </button>
+            <span style={{ fontSize: "12px", color: "var(--text-muted)", alignSelf: "center" }}>atau</span>
+            <label className="tool-pill" style={{ cursor: "pointer", margin: 0 }}>
+              <Icon name="upload" size={16} /> + Unggah Tanda Tangan
+              <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, "sig")} />
+            </label>
           </div>
-        )}
+        </div>
 
-        <span className="sep hide-mobile" />
+        <span className="sep" style={{ height: "auto" }} />
 
-        {/* Stamp Group */}
-        {(activeTab === "stamp" || window.innerWidth > 768) && (
-          <div className="toolbar-group">
-            <div className="toolbar-label">Stamp & Seal</div>
-            <div className="toolbar-actions">
-              <label className="tool-pill pointer">
-                <Icon name="plus" size={14} /> Add Stamp
-                <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, "stamp")} />
-              </label>
-            </div>
+        {/* Stempel Group */}
+        <div className="toolbar-group">
+          <div className="toolbar-group-label">Stempel &amp; Materai</div>
+          <div className="toolbar-actions">
+            <label className="tool-pill" style={{ cursor: "pointer", margin: 0 }}>
+              <Icon name="plus" size={16} /> + Tambah Stempel
+              <input type="file" accept="image/*" hidden onChange={(e) => handleImageUpload(e, "stamp")} />
+            </label>
           </div>
-        )}
+        </div>
 
-        <span className="sep hide-mobile" />
+        <span className="sep" style={{ height: "auto" }} />
 
-        {/* Text/Date Group */}
-        {(activeTab === "text" || window.innerWidth > 768) && (
-          <div className="toolbar-group">
-            <div className="toolbar-label">Content</div>
-            <div className="toolbar-actions">
-              <button className="tool-pill" onClick={() => addText("New Text", "text")}>
-                <Icon name="type" size={14} /> Text
-              </button>
-              <button className="tool-pill" onClick={() => addText(new Date().toLocaleDateString(), "date")}>
-                <Icon name="calendar" size={14} /> Date
-              </button>
-            </div>
+        {/* Basic Tools Group */}
+        <div className="toolbar-group">
+          <div className="toolbar-group-label">Teks &amp; Tanggal</div>
+          <div className="toolbar-actions">
+            <button type="button" className="tool-pill" onClick={() => addText("Teks", "text")}>
+              <Icon name="type" size={16} /> Teks
+            </button>
+            <button type="button" className="tool-pill" onClick={() => addText(today, "date")}>
+              <Icon name="calendar" size={16} /> Tanggal
+            </button>
           </div>
+        </div>
+
+        {sel && (sel.type === "text" || sel.type === "date") && (
+          <>
+            <span className="sep" style={{ height: "auto" }} />
+            <div className="toolbar-group">
+              <div className="toolbar-group-label">Format</div>
+              <div className="toolbar-actions" style={{ alignItems: "center" }}>
+                <div style={{ width: 100 }}>
+                  <RangeField value={Math.round((sel.fsFrac ?? 0.025) * 1000)} min={12} max={60} onChange={(v) => update(sel.id, { fsFrac: v / 1000 })} fmt={(v) => `${v}`} />
+                </div>
+                <input type="color" className="color-swatch" value={sel.color ?? "#1a1a2e"} onChange={(e) => update(sel.id, { color: e.target.value })} aria-label="Text color" />
+              </div>
+            </div>
+          </>
         )}
 
-        {/* Format controls for text */}
-        {selected && anns.find(a => a.id === selected)?.type !== 'sig' && (
-           <div className="toolbar-group">
-             <div className="toolbar-label">Format</div>
-             <div className="toolbar-actions">
-                <input type="color" className="color-swatch" onChange={(e) => update(selected, { color: e.target.value })} />
-             </div>
-           </div>
-        )}
-
-        <div className="pager-fixed">
-          <button className="icon-btn" onClick={() => setCur(p => Math.max(0, p-1))} disabled={cur===0}><Icon name="chevronLeft" /></button>
-          <span className="mono">{cur + 1} / {pages.length}</span>
-          <button className="icon-btn" onClick={() => setCur(p => Math.min(pages.length-1, p+1))} disabled={cur===pages.length-1}><Icon name="chevronRight" /></button>
+        <div className="pager">
+          <button type="button" className="icon-btn" onClick={() => setCur((c) => Math.max(0, c - 1))} disabled={cur === 0} aria-label="Previous page">
+            <Icon name="chevronRight" size={16} style={{ transform: "rotate(180deg)" }} />
+          </button>
+          <span className="mono">{cur + 1}</span> / {pages.length}
+          <button type="button" className="icon-btn" onClick={() => setCur((c) => Math.min(pages.length - 1, c + 1))} disabled={cur === pages.length - 1} aria-label="Next page">
+            <Icon name="chevronRight" size={16} />
+          </button>
         </div>
       </div>
 
-      <div className="canvas-stage">
-        <div 
-          className="page-canvas" 
+      <div className="run-bar" style={{ marginTop: 0 }}>
+        <RunButton onClick={run} busy={busy} icon="download">
+          Apply &amp; download
+        </RunButton>
+        <button type="button" className="btn btn-ghost" onClick={reset} disabled={busy}>
+          Load another
+        </button>
+      </div>
+
+      <div className="canvas-stage" onMouseDown={() => { setSelected(null); setEditing(null); }}>
+        <div
+          className="page-canvas"
           ref={pageBoxRef}
-          style={{ 
-            aspectRatio: `${pages[cur].ptW}/${pages[cur].ptH}`, 
-            maxWidth: '100%', 
-            width: pages[cur].ptW,
-            position: 'relative'
-          } as CSSProperties}
+          style={{ aspectRatio: `${pages[cur].ptW} / ${pages[cur].ptH}`, width: "100%", maxWidth: 540, containerType: "size" } as CSSProperties}
+          onMouseDown={(e) => e.stopPropagation()}
         >
-          <img src={pages[cur].url} draggable={false} alt="pdf page" className="page-img" />
-          
-          {anns.filter(a => a.page === cur).map(a => {
+          { }
+          <img src={pages[cur].url} alt={`Page ${cur + 1}`} draggable={false} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
+          {anns.filter((a) => a.page === cur).map((a) => {
             const isSel = a.id === selected;
+            const style: CSSProperties = { left: `${a.xFrac * 100}%`, top: `${a.yFrac * 100}%` };
             return (
-              <div 
-                key={a.id} 
-                className={cx("annot", isSel && "selected")}
-                style={{ left: `${a.xFrac * 100}%`, top: `${a.yFrac * 100}%`, position: 'absolute' }}
+              <div
+                key={a.id}
+                className={cx("annot", a.type, isSel && "selected")}
+                style={style}
                 onPointerDown={(e) => onPointerDown(e, a, "move")}
+                onMouseDown={(e) => e.stopPropagation()}
               >
-                {a.type === 'sig' ? (
-                  <div style={{ position: 'relative' }}>
-                    <img src={a.img} alt="sig" style={{ width: `${(a.wFrac || 0.3) * 100}%`, height: 'auto', display: 'block' }} />
-                    {isSel && <div className="resizer" onPointerDown={(e) => onPointerDown(e, a, "resize")} />}
-                  </div>
+                {a.type === "sig" ? (
+                  <>
+                    { }
+                    <img src={a.img} alt="signature" draggable={false} style={{ width: `${(a.wFrac ?? 0.3) * 100}cqw`, height: "auto", display: "block" }} />
+                    {isSel && <span className="handle br" onPointerDown={(e) => onPointerDown(e, a, "resize")} />}
+                  </>
                 ) : (
-                  <div 
-                    contentEditable 
+                  <span
+                    style={{ fontSize: `${(a.fsFrac ?? 0.025) * 100}cqh`, color: a.color, whiteSpace: "pre", display: "block", outline: "none" }}
+                    contentEditable={editing === a.id}
                     suppressContentEditableWarning
-                    style={{ fontSize: `calc(${(a.fsFrac || 0.025) * 100} * 1cqw)`, color: a.color }}
-                    onBlur={(e) => update(a.id, { text: e.currentTarget.innerText })}
+                    onDoubleClick={() => { setEditing(a.id); setSelected(a.id); }}
+                    onBlur={(e) => { update(a.id, { text: e.currentTarget.innerText }); setEditing(null); }}
                   >
                     {a.text}
-                  </div>
+                  </span>
                 )}
-                {isSel && <button className="del-btn" onClick={() => removeAnn(a.id)}><Icon name="x" size={10} /></button>}
+                {isSel && (
+                  <button
+                    type="button"
+                    onClick={() => removeAnn(a.id)}
+                    aria-label="Remove"
+                    style={{ position: "absolute", top: -10, right: -10, width: 20, height: 20, borderRadius: "50%", background: "var(--error)", color: "#fff", display: "grid", placeItems: "center", boxShadow: "var(--shadow-sm)" }}
+                  >
+                    <Icon name="x" size={12} strokeWidth={2.5} />
+                  </button>
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      <div className="run-bar-sticky">
-        <RunButton onClick={run} busy={busy}>Apply & Download</RunButton>
-        <button className="btn-ghost" onClick={reset}>Upload New PDF</button>
-      </div>
+      <p className="muted" style={{ fontSize: "var(--text-xs)" }}>
+        Tip: double-click text to edit · drag to move · drag the corner dot to resize a signature.
+      </p>
 
-      {padOpen && (
-        <SignaturePad 
-          onCancel={() => setPadOpen(false)} 
-          onSave={(img, aspect) => { addSignature(img, aspect); setPadOpen(false); }} 
-        />
+      {note && (
+        <Banner kind={note.kind === "ok" ? "success" : "error"} title={note.kind === "ok" ? "Done" : "Couldn't export"}>
+          {note.msg}
+        </Banner>
       )}
 
-      <style jsx>{`
-        .flex-responsive { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
-        .toolbar-group { display: flex; flex-direction: column; gap: 4px; }
-        .toolbar-label { font-size: 10px; text-transform: uppercase; color: #666; font-weight: 600; }
-        .toolbar-actions { display: flex; gap: 8px; align-items: center; }
-        .tool-pill { 
-          display: flex; align-items: center; gap: 6px; padding: 6px 12px; 
-          background: #f0f0f0; border-radius: 6px; font-size: 13px; border: none; cursor: pointer;
-        }
-        .tool-pill:hover { background: #e2e2e2; }
-        .mobile-tabs-nav { display: none; border-bottom: 1px solid #eee; padding: 8px; gap: 4px; }
-        .tab-item { flex: 1; padding: 8px; border: none; background: none; font-size: 12px; border-radius: 4px; }
-        .tab-item.active { background: #000; color: #fff; }
-        .pager-fixed { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-        
-        @media (max-width: 768px) {
-          .mobile-tabs-nav { display: flex; }
-          .hide-mobile { display: none; }
-          .editor-toolbar { padding: 12px; justify-content: center; }
-          .pager-fixed { width: 100%; justify-content: center; margin-top: 8px; }
-        }
-      `}</style>
+      {padOpen && <SignaturePad onCancel={() => setPadOpen(false)} onSave={(img, aspect) => { setPadOpen(false); addSignature(img, aspect); }} />}
     </div>
   );
 }
 
-/* --- Signature Pad Component --- */
-function SignaturePad({ onSave, onCancel }: { onSave: (img: string, aspect: number) => void; onCancel: () => void }) {
+/* ---------------- Signature pad modal ---------------- */
+function SignaturePad({
+  onSave,
+  onCancel,
+}: {
+  onSave: (img: string, aspect: number) => void;
+  onCancel: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [hasInk, setHasInk] = useState(false);
   const drawing = useRef(false);
+  const dirty = useRef(false);
+  const last = useRef<{ x: number; y: number } | null>(null);
+  const [hasInk, setHasInk] = useState(false);
 
-  const start = (e: RPointerEvent) => {
-    drawing.current = true;
-    const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
-    const r = canvasRef.current!.getBoundingClientRect();
-    ctx.beginPath();
-    ctx.moveTo(e.clientX - r.left, e.clientY - r.top);
-    setHasInk(true);
+  const pos = (e: RPointerEvent) => {
+    const c = canvasRef.current!;
+    const r = c.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * c.width, y: ((e.clientY - r.top) / r.height) * c.height };
   };
-
+  const down = (e: RPointerEvent) => {
+    drawing.current = true;
+    dirty.current = true;
+    setHasInk(true);
+    last.current = pos(e);
+  };
   const move = (e: RPointerEvent) => {
     if (!drawing.current) return;
-    const ctx = canvasRef.current?.getContext("2d");
-    const r = canvasRef.current!.getBoundingClientRect();
-    ctx?.lineTo(e.clientX - r.left, e.clientY - r.top);
-    ctx?.stroke();
+    const c = canvasRef.current?.getContext("2d");
+    if (!c || !last.current) return;
+    const p = pos(e);
+    c.strokeStyle = "#16140f";
+    c.lineWidth = 2.6;
+    c.lineCap = "round";
+    c.lineJoin = "round";
+    c.beginPath();
+    c.moveTo(last.current.x, last.current.y);
+    c.lineTo(p.x, p.y);
+    c.stroke();
+    last.current = p;
   };
-
+  const up = () => {
+    drawing.current = false;
+    last.current = null;
+  };
+  const clear = () => {
+    const c = canvasRef.current;
+    c?.getContext("2d")?.clearRect(0, 0, c.width, c.height);
+    dirty.current = false;
+    setHasInk(false);
+  };
   const save = () => {
     const c = canvasRef.current;
-    if (c) onSave(c.toDataURL(), c.width / c.height);
+    if (!c || !dirty.current) return;
+    onSave(c.toDataURL("image/png"), c.height / c.width);
   };
 
   return (
-    <Modal title="Draw Signature" onClose={onCancel} foot={
-      <div className="flex gap-2">
-        <button className="btn-ghost" onClick={onCancel}>Cancel</button>
-        <button className="btn-primary" onClick={save} disabled={!hasInk}>Use Signature</button>
+    <Modal
+      title="Draw your signature"
+      onClose={onCancel}
+      foot={
+        <>
+          <button type="button" className="btn btn-ghost" onClick={clear}>Clear</button>
+          <button type="button" className="btn btn-primary" onClick={save} disabled={!hasInk}>Use signature</button>
+        </>
+      }
+    >
+      <div className="sig-pad">
+        <canvas ref={canvasRef} width={560} height={200} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={up} />
+        {!hasInk && <div className="sig-hint">Sign here with your mouse or finger</div>}
       </div>
-    }>
-      <canvas 
-        ref={canvasRef} 
-        width={500} 
-        height={200} 
-        onPointerDown={start} 
-        onPointerMove={move} 
-        onPointerUp={() => drawing.current = false}
-        style={{ border: '1px dashed #ccc', width: '100%', touchAction: 'none' }}
-      />
     </Modal>
   );
-}
+  }
